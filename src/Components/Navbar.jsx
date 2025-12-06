@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router';
 import Logo from '../Shared/Logo/Logo';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
   const links = (
@@ -101,7 +102,8 @@ const Navbar = () => {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal my-2 px-1 space-x-2">{links}</ul>
       </div>
-      <div className="navbar-end">
+      <div className="navbar-end gap-2">
+        <ThemeToggle />
         <button className="btn btn-primary btn-sm font-bold hover:scale-105 rounded-4xl transition-transform duration-200">
           <Link to='/login'>Login</Link>
         </button>

@@ -36,6 +36,18 @@
   --color-neutral-content: #111827;
   /* Text color on neutral backgrounds */
 
+  --color-base-100: #FFFFFF;
+  /* Main background color for cards, modals, etc. */
+
+  --color-base-200: #F9FAFB;
+  /* Secondary background color */
+
+  --color-base-300: #E5E7EB;
+  /* Tertiary background color */
+
+  --color-base-content: #111827;
+  /* Text color on base backgrounds */
+
   --color-info: #3B82F6;             
   /* Use for: Info messages, notifications, tooltips, info badges */
 
@@ -90,6 +102,18 @@
 
   --color-neutral-content: #F3F4F6;  
   /* Text color on neutral backgrounds */
+
+  --color-base-100: #1F2937;
+  /* Main background color for cards, modals, etc. in dark mode */
+
+  --color-base-200: #111827;
+  /* Secondary background color in dark mode */
+
+  --color-base-300: #374151;
+  /* Tertiary background color in dark mode */
+
+  --color-base-content: #F3F4F6;
+  /* Text color on base backgrounds in dark mode */
 
   --color-info: #60A5FA;             
   /* Info messages, tooltips in dark mode */

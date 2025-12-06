@@ -11,8 +11,8 @@ const MainLayouts = () => {
       - Apply page background color depending on theme
       - min-h-screen ensures footer sticks to bottom on short pages
     */
-    <div className="bg-neutral dark:bg-neutral transition-colors duration-300">
-      <div className="min-h-screen w-11/12 mx-auto bg-neutral dark:bg-neutral transition-colors duration-300 py-6">
+    <div className="bg-base-200 transition-colors duration-300">
+      <div className="min-h-screen w-11/12 mx-auto transition-colors duration-300 py-6">
         {/* Navbar stays on top */}
         <Navbar />
 
