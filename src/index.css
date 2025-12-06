@@ -1,2 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap');
+
+
 @import "tailwindcss";
 @plugin "daisyui";
+
+/* ---------- Light Theme ---------- */
+@plugin "daisyui/theme" {
+  name: "digitalLifeLight";
+  default: true;
+
+  /* ---------- Core Colors ---------- */
+  
+  --color-primary: #4F46E5;          
+  /* Use for: Primary buttons, links, highlights, call-to-action elements */
+
+  --color-primary-content: #FFFFFF;
+  /* Text color on primary elements (e.g., text on primary button) */
+
+  --color-secondary: #10B981;        
+  /* Use for: Secondary buttons, badges, info highlights, minor actions */
+
+  --color-secondary-content: #FFFFFF;
+  /* Text color on secondary elements */
+
+  --color-accent: #F59E0B;           
+  /* Use for: Accent highlights, important badges, callout messages */
+
+  --color-accent-content: #FFFFFF;
+  /* Text color on accent elements */
+
+  --color-neutral: #F3F4F6;          
+  /* Use for: Card backgrounds, container backgrounds, modals, neutral sections */
+
+  --color-neutral-content: #111827;
+  /* Text color on neutral backgrounds */
+
+  --color-info: #3B82F6;             
+  /* Use for: Info messages, notifications, tooltips, info badges */
+
+  --color-info-content: #FFFFFF;
+  /* Text color on info elements */
+
+  --color-success: #10B981;          
+  /* Use for: Success messages, confirmation alerts, success badges */
+
+  --color-success-content: #FFFFFF;
+  /* Text color on success elements */
+
+  --color-warning: #FBBF24;          
+  /* Use for: Warning messages, alerts, caution badges */
+
+  --color-warning-content: #111827;
+  /* Text color on warning elements */
+
+  --color-error: #EF4444;            
+  /* Use for: Error messages, invalid input highlights, danger alerts */
+
+  --color-error-content: #FFFFFF;
+  /* Text color on error elements */
+}
+
+/* ---------- Dark Theme ---------- */
+@plugin "daisyui/theme" {
+  name: "digitalLifeDark";
+
+  /* ---------- Core Colors ---------- */
+
+  --color-primary: #8B5CF6;          
+  /* Primary buttons, links, highlights in dark mode */
+
+  --color-primary-content: #F3F4F6;  
+  /* Text color on primary elements */
+
+  --color-secondary: #6EE7B7;        
+  /* Secondary buttons, badges in dark mode */
+
+  --color-secondary-content: #111827;
+  /* Text color on secondary elements */
+
+  --color-accent: #FBBF24;           
+  /* Accent highlights, callout badges in dark mode */
+
+  --color-accent-content: #111827;   
+  /* Text color on accent elements */
+
+  --color-neutral: #1F2937;          
+  /* Card or container backgrounds in dark mode */
+
+  --color-neutral-content: #F3F4F6;  
+  /* Text color on neutral backgrounds */
+
+  --color-info: #60A5FA;             
+  /* Info messages, tooltips in dark mode */
+
+  --color-info-content: #111827;     
+  /* Text color on info elements */
+
+  --color-success: #34D399;          
+  /* Success messages and badges in dark mode */
+
+  --color-success-content: #111827;  
+  /* Text color on success elements */
+
+  --color-warning: #FCD34D;          
+  /* Warning messages, alerts in dark mode */
+
+  --color-warning-content: #111827;  
+  /* Text color on warning elements */
+
+  --color-error: #F87171;            
+  /* Error messages, invalid inputs in dark mode */
+
+  --color-error-content: #111827;    
+  /* Text color on error elements */
+}
+
+*{
+  font-family: "Inter", sans-serif;
+}
+
