@@ -5,8 +5,7 @@ const Logo = () => {
   return (
     <Link
       to="/"
-      className="font-extrabold text-2xl bg-clip-text text-transparent 
-             bg-linear-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-all duration-500"
+      className="font-bold lg:font-extrabold text-lg md:text-2xl bg-clip-text text-transparent bg-linear-to-r from-primary to-secondary hover:from-secondary hover:to-primary transition-all duration-500"
     >
       DigitalLifeLessons
     </Link>

@@ -105,7 +105,10 @@ const Navbar = () => {
       <div className="navbar-end gap-2">
         <ThemeToggle />
         <button className="btn btn-primary btn-sm font-bold hover:scale-105 rounded-4xl transition-transform duration-200">
-          <Link to='/login'>Login</Link>
+          <Link to="/login">Login</Link>
+        </button>
+        <button className="btn btn-secondary btn-sm font-bold hover:scale-105 rounded-4xl transition-transform duration-200">
+          <Link to="/register">Signup</Link>
         </button>
       </div>
     </div>

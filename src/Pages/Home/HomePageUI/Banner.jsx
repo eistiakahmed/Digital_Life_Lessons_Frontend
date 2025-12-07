@@ -91,12 +91,12 @@ const Banner = () => {
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>
             <div
-              className={`relative h-[70vh] bg-linear-to-br ${slide.gradient} transition-all duration-500`}
+              className={`relative py-8 sm:py-12 md:py-16 lg:py-20 min-h-[600px] sm:min-h-[650px] md:min-h-[700px] lg:min-h-0 bg-linear-to-br ${slide.gradient} transition-all duration-500`}
             >
-        
-              <div className="absolute inset-0 overflow-hidden opacity-30">
+              {/* Animated Background Shapes */}
+              <div className="absolute inset-0 overflow-hidden opacity-20 md:opacity-30">
                 <motion.div
-                  className="absolute top-10 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl"
+                  className="absolute top-5 left-5 sm:top-10 sm:left-10 w-48 h-48 sm:w-72 sm:h-72 bg-primary/20 rounded-full blur-3xl"
                   animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
                   transition={{
                     duration: 4,
@@ -105,7 +105,7 @@ const Banner = () => {
                   }}
                 />
                 <motion.div
-                  className="absolute bottom-10 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl"
+                  className="absolute bottom-5 right-5 sm:bottom-10 sm:right-10 w-64 h-64 sm:w-96 sm:h-96 bg-secondary/20 rounded-full blur-3xl"
                   animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
                   transition={{
                     duration: 5,
@@ -116,18 +116,19 @@ const Banner = () => {
                 />
               </div>
 
-              <div className="container mx-auto px-6 relative z-10 h-full flex items-center">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full">
-                  
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 h-full flex items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center w-full">
+                  {/* Text Content */}
                   <motion.div
-                    className="space-y-6 order-2 lg:order-1"
+                    className="space-y-4 sm:space-y-5 lg:space-y-6 order-2 lg:order-1"
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, ease: 'easeOut' }}
                   >
+                    {/* Badge */}
                     <motion.span
-                      className={`inline-flex items-center gap-2 ${slide.badgeColor} text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-lg`}
+                      className={`inline-flex items-center gap-2 ${slide.badgeColor} text-white px-3 py-2 sm:px-4 sm:py-2.5 lg:px-5 rounded-full text-xs sm:text-sm font-bold shadow-lg`}
                       animate={{ y: [0, -5, 0] }}
                       transition={{
                         duration: 2,
@@ -135,31 +136,31 @@ const Banner = () => {
                         ease: 'easeInOut',
                       }}
                     >
-                      <FaStar className="w-4 h-4" />
+                      <FaStar className="w-3 h-3 sm:w-4 sm:h-4" />
                       {slide.badge}
                     </motion.span>
 
+                    {/* Title Section */}
                     <motion.div
-                      className="space-y-3"
+                      className="space-y-2 sm:space-y-3"
                       initial={{ opacity: 0, x: -30 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.6, delay: 0.2 }}
                     >
-                      <h1
-                        className={`text-3xl md:text-5xl lg:text-6xl font-extrabold bg-linear-to-r from-base-content to-base-content/70 bg-clip-text text-transparent leading-tight`}
-                      >
+                      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold bg-linear-to-r from-base-content to-base-content/70 bg-clip-text text-transparent leading-tight">
                         {slide.title}
                       </h1>
                       <p
-                        className={`text-xl md:text-2xl font-bold ${slide.accentColor} dark:text-primary`}
+                        className={`text-base sm:text-lg md:text-xl lg:text-2xl font-bold ${slide.accentColor} dark:text-primary`}
                       >
                         {slide.subtitle}
                       </p>
                     </motion.div>
 
+                    {/* Description */}
                     <motion.p
-                      className="text-base md:text-lg text-base-content/80 leading-relaxed"
+                      className="text-sm sm:text-base lg:text-lg text-base-content/80 leading-relaxed"
                       initial={{ opacity: 0 }}
                       whileInView={{ opacity: 1 }}
                       viewport={{ once: true }}
@@ -168,9 +169,9 @@ const Banner = () => {
                       {slide.description}
                     </motion.p>
 
-                    
+                    {/* Features Grid */}
                     <motion.div
-                      className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-4"
+                      className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 lg:gap-4 py-2 sm:py-3 lg:py-4"
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
@@ -179,31 +180,31 @@ const Banner = () => {
                       {slide.features.map((feature, idx) => (
                         <motion.div
                           key={idx}
-                          className="flex items-center gap-2 bg-base-100/50 backdrop-blur-sm px-3 py-2 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                          className="flex items-center gap-2 bg-base-100/50 backdrop-blur-sm px-2 py-2 sm:px-3 sm:py-2 rounded-lg shadow-md hover:shadow-lg transition-shadow"
                           whileHover={{ scale: 1.05 }}
                           transition={{ type: 'spring', stiffness: 300 }}
                         >
-                          <feature.icon className="w-5 h-5 text-success shrink-0" />
-                          <span className="text-sm font-semibold text-base-content">
+                          <feature.icon className="w-4 h-4 sm:w-5 sm:h-5 text-success shrink-0" />
+                          <span className="text-xs sm:text-sm font-semibold text-base-content">
                             {feature.text}
                           </span>
                         </motion.div>
                       ))}
                     </motion.div>
 
-                    
+                    {/* Card */}
                     <motion.div
-                      className="flex items-center gap-6 py-2"
+                      className="flex items-center gap-4 sm:gap-6 py-2"
                       initial={{ opacity: 0, scale: 0.8 }}
                       whileInView={{ opacity: 1, scale: 1 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.6, delay: 0.5 }}
                     >
                       <div
-                        className={`bg-linear-to-br ${slide.gradient} backdrop-blur-md border border-base-content/10 shadow-xl rounded-2xl p-6`}
+                        className={`bg-linear-to-br ${slide.gradient} backdrop-blur-md border border-base-content/10 shadow-xl rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6`}
                       >
                         <motion.div
-                          className={`text-4xl font-extrabold ${slide.accentColor} dark:text-primary`}
+                          className={`text-2xl sm:text-3xl lg:text-4xl font-extrabold ${slide.accentColor} dark:text-primary`}
                           initial={{ scale: 0 }}
                           whileInView={{ scale: 1 }}
                           viewport={{ once: true }}
@@ -215,30 +216,31 @@ const Banner = () => {
                         >
                           {slide.stats.value}
                         </motion.div>
-                        <div className="text-sm font-medium text-base-content/70 mt-1">
+                        <div className="text-xs sm:text-sm font-medium text-base-content/70 mt-1">
                           {slide.stats.label}
                         </div>
                       </div>
                     </motion.div>
 
-                    
+                    {/* Buttons */}
                     <motion.div
-                      className="flex flex-wrap gap-4 pt-2"
+                      className="flex flex-wrap gap-3 sm:gap-4 pt-2"
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.6, delay: 0.6 }}
                     >
                       <motion.button
-                        className={`btn btn-lg gap-2 ${slide.badgeColor} text-white border-none`}
+                        className={`btn btn-sm sm:btn-md lg:btn-lg gap-2 ${slide.badgeColor} text-white border-none`}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         transition={{ type: 'spring', stiffness: 400 }}
                       >
-                        {slide.buttonText} <FaArrowRight className="w-4 h-4" />
+                        {slide.buttonText}
+                        <FaArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                       </motion.button>
                       <motion.button
-                        className="btn btn-lg btn-outline gap-2"
+                        className="btn btn-sm sm:btn-md lg:btn-lg btn-outline gap-2"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         transition={{ type: 'spring', stiffness: 400 }}
@@ -248,26 +250,27 @@ const Banner = () => {
                     </motion.div>
                   </motion.div>
 
-                  
+                  {/* Image Section */}
                   <motion.div
-                    className="order-1 lg:order-2 flex justify-center"
+                    className="order-1 lg:order-2 flex justify-center items-center"
                     initial={{ opacity: 0, x: 50, scale: 0.9 }}
                     whileInView={{ opacity: 1, x: 0, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, ease: 'easeOut' }}
                   >
                     <motion.div
-                      className={`relative rounded-2xl overflow-hidden shadow-2xl border-4 ${slide.badgeColor} p-1 max-h-[60vh]`}
+                      className={`relative rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-2 sm:border-4 ${slide.badgeColor} p-0.5 sm:p-1 w-full max-w-[280px] sm:max-w-[350px] md:max-w-[450px] lg:max-w-full`}
                       whileHover={{ scale: 1.02 }}
                       transition={{ type: 'spring', stiffness: 300 }}
                     >
                       <img
                         src={slide.image}
                         alt={slide.title}
-                        className="w-full h-full object-cover rounded-xl"
+                        className="w-full h-auto object-cover rounded-lg sm:rounded-xl"
                       />
+                      {/* Trending Badge */}
                       <motion.div
-                        className={`absolute top-4 right-4 ${slide.badgeColor} text-white px-4 py-2 rounded-full font-bold shadow-lg text-sm flex items-center gap-2`}
+                        className={`absolute top-2 right-2 sm:top-4 sm:right-4 ${slide.badgeColor} text-white px-2 py-1 sm:px-3 sm:py-2 lg:px-4 rounded-full font-bold shadow-lg text-xs sm:text-sm flex items-center gap-1 sm:gap-2`}
                         animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
                         transition={{
                           duration: 2,
@@ -275,8 +278,9 @@ const Banner = () => {
                           ease: 'easeInOut',
                         }}
                       >
-                        <FaStar className="text-yellow-300" />
-                        Trending
+                        <FaStar className="text-yellow-300 w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="hidden sm:inline">Trending</span>
+                        <span className="sm:hidden">Hot</span>
                       </motion.div>
                     </motion.div>
                   </motion.div>

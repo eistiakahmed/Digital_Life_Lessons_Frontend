@@ -7,6 +7,8 @@ import Pricing from '../Pages/Pricing/Pricing';
 import DashboardHome from '../Pages/Dashboard/DashboardHome/DashboardHome';
 import AddLesson from '../Pages/Lessons/AddLesson';
 import MyLessons from '../Pages/Lessons/MyLessons';
+import Login from '../Pages/Auth/Login';
+import Register from '../Pages/Auth/Register';
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +27,14 @@ export const router = createBrowserRouter([
         path: '/pricing',
         element: <Pricing />,
       },
+      {
+        path: '/login',
+        element: <Login />,
+      },
+      {
+        path: '/register',
+        element: <Register />,
+      },
     ],
   },
   {
@@ -37,12 +47,12 @@ export const router = createBrowserRouter([
       },
       {
         path: 'add_lesson',
-        element: <AddLesson />
+        element: <AddLesson />,
       },
       {
         path: 'my_lessons',
-        element: <MyLessons />
-      }
+        element: <MyLessons />,
+      },
     ],
   },
 ]);
