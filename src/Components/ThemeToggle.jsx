@@ -1,4 +1,3 @@
-import React from 'react';
 import { MdLightMode, MdDarkMode } from 'react-icons/md';
 import useTheme from '../hooks/useTheme';
 
@@ -8,7 +7,7 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="btn btn-ghost btn-circle swap swap-rotate"
+      className="btn btn-ghost btn-circle"
       aria-label="Toggle theme"
     >
       {isDark ? (

@@ -2,13 +2,15 @@ import { createBrowserRouter } from 'react-router';
 import MainLayouts from '../Layouts/MainLayouts';
 import Home from '../Pages/Home/Home';
 import DashboardLayouts from '../Layouts/DashboardLayouts';
-import PublicLessons from '../Pages/Lessons/PublicLessons';
 import Pricing from '../Pages/Pricing/Pricing';
 import DashboardHome from '../Pages/Dashboard/DashboardHome/DashboardHome';
-import AddLesson from '../Pages/Lessons/AddLesson';
-import MyLessons from '../Pages/Lessons/MyLessons';
 import Login from '../Pages/Auth/Login';
 import Register from '../Pages/Auth/Register';
+import PublicLessons from '../Pages/PublicLessons/PublicLessons';
+import AddLesson from '../Pages/Dashboard/Lessons/AddLesson';
+import MyLessons from '../Pages/Dashboard/Lessons/MyLessons';
+import Profile from '../Pages/Dashboard/Profile/Profile';
+import PrivateRoutes from './PrivateRoutes/PrivateRoutes';
 
 export const router = createBrowserRouter([
   {
@@ -39,7 +41,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/dashboard',
-    element: <DashboardLayouts />,
+    element: (
+      <PrivateRoutes>
+        <DashboardLayouts />
+      </PrivateRoutes>
+    ),
     children: [
       {
         index: true,
@@ -52,6 +58,10 @@ export const router = createBrowserRouter([
       {
         path: 'my_lessons',
         element: <MyLessons />,
+      },
+      {
+        path: 'profile',
+        element: <Profile />,
       },
     ],
   },
