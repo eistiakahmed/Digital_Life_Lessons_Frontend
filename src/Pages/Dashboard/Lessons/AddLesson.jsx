@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-
 import toast from 'react-hot-toast';
 import useAuth from '../../../hooks/useAuth';
 import useAxios from '../../../hooks/useAxios';
@@ -12,15 +11,15 @@ const categories = [
   'Mindset',
   'Mistakes Learned',
 ];
-
 const emotions = ['Motivational', 'Sad', 'Realization', 'Gratitude'];
-
 const privacyOptions = ['Public', 'Private'];
 
 const AddLesson = () => {
   const { user } = useAuth();
-  console.log(user);
   const axios = useAxios();
+
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const {
     register,
@@ -29,30 +28,47 @@ const AddLesson = () => {
     reset,
   } = useForm();
 
-  // const isPremiumUser = user?.isPremium;  //TODO : Update isPremium from database(MongoDB)
+  // Fetch latest user info from backend
+  useEffect(() => {
+    const fetchUserStatus = async () => {
+      if (!user?.email) return;
+      try {
+        const res = await axios.get(`/user/${user.email}`);
+        setIsPremiumUser(res.data?.isPremium || false);
+      } catch (err) {
+        console.log(err);
+        toast.error('Failed to fetch user data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserStatus();
+  }, [user?.email, axios]);
 
   const onSubmit = async (data) => {
+    if (data.accessLevel === 'Premium' && !isPremiumUser) {
+      return toast.error('You need Premium access to create Premium lessons!');
+    }
+
     const finalLesson = {
       title: data.title,
       description: data.description,
       category: data.category,
       emotion: data.emotion,
       privacy: data.privacy,
-      accessLevel: data.accessLevel,
+      accessLevel: data.accessLevel || 'Free',
       image: data.image || null,
       createdAt: new Date(),
       authorName: user?.displayName,
       authorEmail: user?.email,
       authorImage: user?.photoURL,
+      isFeatured: false,
       views: 0,
       favorites: 0,
     };
 
-    // console.log(finalLesson);
-
     try {
       const res = await axios.post('/lessons', finalLesson);
-
       if (res.data.insertedId) {
         toast.success('Lesson Created Successfully!');
         reset();
@@ -65,12 +81,15 @@ const AddLesson = () => {
     }
   };
 
+  if (loading) {
+    return <p className="text-center mt-8">Loading user data...</p>;
+  }
+
   return (
     <div className="max-w-3xl mx-auto bg-base-100 shadow-lg p-6 rounded-xl">
       <h2 className="text-2xl font-bold mb-6 text-primary">
         Create New Lesson
       </h2>
-
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Title */}
         <div>
@@ -149,20 +168,22 @@ const AddLesson = () => {
         </div>
 
         {/* Access Level */}
-        {/* <div>
+        <div>
           <label className="font-semibold">Access Level</label>
           <select
             {...register('accessLevel')}
             disabled={!isPremiumUser}
             className="select select-bordered w-full disabled:bg-base-300 disabled:cursor-not-allowed"
             title={
-              !isPremiumUser ? 'Upgrade to Premium to create paid lessons' : ''
+              !isPremiumUser
+                ? 'Upgrade to Premium to create Premium lessons'
+                : ''
             }
           >
             <option value="Free">Free</option>
             <option value="Premium">Premium</option>
           </select>
-        </div> */}
+        </div>
 
         {/* Image URL optional */}
         <div>

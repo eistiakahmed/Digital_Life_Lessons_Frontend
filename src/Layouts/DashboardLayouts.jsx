@@ -2,10 +2,25 @@ import React from 'react';
 import { NavLink, Outlet } from 'react-router';
 import Logo from '../Shared/Logo/Logo';
 import ThemeToggle from '../Components/ThemeToggle';
+import useAuth from '../hooks/useAuth';
+import toast from 'react-hot-toast';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { LuBookMarked, LuLayoutDashboard } from 'react-icons/lu';
+import { FaHeart, FaUser, FaSignOutAlt } from 'react-icons/fa';
 
 const DashboardLayouts = () => {
+  const { LogoutUser } = useAuth();
+
+  const handleLogout = () => {
+    LogoutUser()
+      .then(() => {
+        toast.success('Logged out successfully');
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+  };
+
   return (
     <div className="min-h-screen bg-base-200 transition-colors duration-300">
       <div className="flex w-11/12 mx-auto gap-6 py-6">
@@ -69,6 +84,40 @@ const DashboardLayouts = () => {
                 Add Lesson
               </NavLink>
             </li>
+
+            
+            <li>
+              <NavLink
+                to="/dashboard/favorites"
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'bg-primary text-primary-content shadow-md'
+                      : 'hover:bg-base-300 text-base-content'
+                  }`
+                }
+              >
+                <FaHeart size={20} />
+                Favorites
+              </NavLink>
+            </li>
+
+            
+            <li>
+              <NavLink
+                to="/dashboard/profile"
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'bg-primary text-primary-content shadow-md'
+                      : 'hover:bg-base-300 text-base-content'
+                  }`
+                }
+              >
+                <FaUser size={20} />
+                Profile
+              </NavLink>
+            </li>
           </ul>
 
           
@@ -84,7 +133,11 @@ const DashboardLayouts = () => {
             <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
             <div className="flex items-center gap-3">
               <ThemeToggle />
-              <button className="btn btn-primary btn-sm font-bold hover:scale-105 rounded-full transition-transform duration-200">
+              <button 
+                onClick={handleLogout}
+                className="btn btn-primary btn-sm font-bold hover:scale-105 rounded-full transition-transform duration-200 gap-2"
+              >
+                <FaSignOutAlt size={16} />
                 Logout
               </button>
             </div>

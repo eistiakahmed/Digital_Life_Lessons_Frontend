@@ -9,13 +9,20 @@ import Register from '../Pages/Auth/Register';
 import PublicLessons from '../Pages/PublicLessons/PublicLessons';
 import AddLesson from '../Pages/Dashboard/Lessons/AddLesson';
 import MyLessons from '../Pages/Dashboard/Lessons/MyLessons';
+import UpdateLesson from '../Pages/Dashboard/Lessons/UpdateLesson';
 import Profile from '../Pages/Dashboard/Profile/Profile';
+import Favorites from '../Pages/Dashboard/Favorites/Favorites';
+import LessonDetails from '../Pages/LessonDetails/LessonDetails';
+import NotFound from '../Pages/NotFound/NotFound';
+import PaymentSuccess from '../Pages/Dashboard/PaymentSuccess/PaymentSuccess';
+import PaymentCancelled from '../Pages/Dashboard/PaymentCancelled/PaymentCancelled';
 import PrivateRoutes from './PrivateRoutes/PrivateRoutes';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <MainLayouts />,
+    errorElement: <NotFound />,
     children: [
       {
         index: true,
@@ -26,8 +33,20 @@ export const router = createBrowserRouter([
         element: <PublicLessons />,
       },
       {
+        path: '/lesson/:id',
+        element: (
+          <PrivateRoutes>
+            <LessonDetails />
+          </PrivateRoutes>
+        ),
+      },
+      {
         path: '/pricing',
-        element: <Pricing />,
+        element: (
+          <PrivateRoutes>
+            <Pricing />
+          </PrivateRoutes>
+        ),
       },
       {
         path: '/login',
@@ -36,6 +55,22 @@ export const router = createBrowserRouter([
       {
         path: '/register',
         element: <Register />,
+      },
+      {
+        path: '/payment/success',
+        element: (
+          <PrivateRoutes>
+            <PaymentSuccess />
+          </PrivateRoutes>
+        ),
+      },
+      {
+        path: '/payment/cancel',
+        element: (
+          <PrivateRoutes>
+            <PaymentCancelled />
+          </PrivateRoutes>
+        ),
       },
     ],
   },
@@ -60,9 +95,21 @@ export const router = createBrowserRouter([
         element: <MyLessons />,
       },
       {
+        path: 'update_lesson/:id',
+        element: <UpdateLesson />,
+      },
+      {
+        path: 'favorites',
+        element: <Favorites />,
+      },
+      {
         path: 'profile',
         element: <Profile />,
       },
     ],
+  },
+  {
+    path: '*',
+    element: <NotFound />,
   },
 ]);
