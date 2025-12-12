@@ -17,6 +17,12 @@ import NotFound from '../Pages/NotFound/NotFound';
 import PaymentSuccess from '../Pages/Dashboard/PaymentSuccess/PaymentSuccess';
 import PaymentCancelled from '../Pages/Dashboard/PaymentCancelled/PaymentCancelled';
 import PrivateRoutes from './PrivateRoutes/PrivateRoutes';
+import AdminDashboard from '../Pages/Dashboard/Admin/AdminDashboard';
+import ManageUsers from '../Pages/Dashboard/Admin/ManageUsers';
+import ManageLessons from '../Pages/Dashboard/Admin/ManageLessons';
+import ReportedLessons from '../Pages/Dashboard/Admin/ReportedLessons';
+import AdminProfile from '../Pages/Dashboard/Admin/AdminProfile';
+import AdminRoutes from './AdminRoutes/AdminRoutes';
 
 export const router = createBrowserRouter([
   {
@@ -105,6 +111,55 @@ export const router = createBrowserRouter([
       {
         path: 'profile',
         element: <Profile />,
+      },
+      {
+        path: 'payment_success',
+        element: <PaymentSuccess />,
+      },
+      {
+        path: 'payment_cancelled',
+        element: <PaymentCancelled />,
+      },
+      // Admin Routes
+      {
+        path: 'admin',
+        element: (
+          <AdminRoutes>
+            <AdminDashboard />
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: 'admin/manage-users',
+        element: (
+          <AdminRoutes>
+            <ManageUsers />
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: 'admin/manage-lessons',
+        element: (
+          <AdminRoutes>
+            <ManageLessons />
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: 'admin/reported-lessons',
+        element: (
+          <AdminRoutes>
+            <ReportedLessons />
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: 'admin/profile',
+        element: (
+          <AdminRoutes>
+            <AdminProfile />
+          </AdminRoutes>
+        ),
       },
     ],
   },

@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import useAuth from '../../../hooks/useAuth';
-import useAxios from '../../../hooks/useAxios';
+import { Link, useSearchParams } from 'react-router';
+
+
+
 import {
   FaCheckCircle,
   FaCrown,
@@ -14,33 +14,31 @@ import {
   FaInfinity,
   FaShieldAlt,
   FaGem,
+  FaSync,
+  FaExclamationTriangle,
 } from 'react-icons/fa';
+import useAxios from '../../../hooks/useAxios';
 
 const PaymentSuccess = () => {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const axios = useAxios();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
-  // Fetch updated user data to confirm premium status
-  const { data: currentUser, refetch } = useQuery({
-    queryKey: ['currentUser', user?.email],
-    queryFn: async () => {
-      if (!user?.email) return null;
-      const res = await axios.get(`/user/${user.email}`);
-      return res.data;
-    },
-    enabled: !!user?.email,
-  });
 
-  // Refresh user data when component mounts
+  const [searchParams] = useSearchParams()
+
+  const sessionId = searchParams.get('session_id');
+
+  console.log(sessionId)
+
   useEffect(() => {
-    if (user?.email) {
-      // Invalidate and refetch user data to get updated premium status
-      queryClient.invalidateQueries(['currentUser']);
-      refetch();
+    if(sessionId){
+      axios.patch(`/payment_success?session_id=${sessionId}`)
+      .then(res => {
+        console.log(res.data)
+      })
     }
-  }, [user?.email, queryClient, refetch]);
+  }, [sessionId, axios])
+  
 
   const premiumFeatures = [
     {
@@ -76,7 +74,7 @@ const PaymentSuccess = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-green-900/20 dark:to-blue-900/20 flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden opacity-30">
         <motion.div
@@ -105,7 +103,7 @@ const PaymentSuccess = () => {
           className="mb-8"
         >
           <div className="relative inline-block">
-            <div className="w-32 h-32 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+            <div className="w-32 h-32 bg-linear-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
               <FaCheckCircle className="w-16 h-16 text-white" />
             </div>
             <motion.div
@@ -125,7 +123,7 @@ const PaymentSuccess = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mb-12"
         >
-          <h1 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
+          <h1 className="text-5xl md:text-6xl font-extrabold bg-linear-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
             Payment Successful! 🎉
           </h1>
           <div className="bg-base-100/80 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-green-200/50 mb-8">
@@ -139,20 +137,50 @@ const PaymentSuccess = () => {
               You now have lifetime access to all premium features and content.
             </p>
             
-            {currentUser?.isPremium && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                className="mt-6 p-4 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-2xl border border-yellow-500/30"
-              >
-                <div className="flex items-center justify-center gap-2 text-yellow-600 font-bold">
-                  <FaCrown className="w-5 h-5" />
-                  Premium Status: ACTIVE
-                  <FaCrown className="w-5 h-5" />
+            {/* Premium Status Display */}
+            {/* <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="mt-6 p-4 rounded-2xl border"
+            >
+              {currentUser?.isPremium ? (
+                <div className="bg-linear-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/30 p-4 rounded-2xl">
+                  <div className="flex items-center justify-center gap-2 text-yellow-600 font-bold">
+                    <FaCrown className="w-5 h-5" />
+                    Premium Status: ACTIVE ✅
+                    <FaCrown className="w-5 h-5" />
+                  </div>
                 </div>
-              </motion.div>
-            )}
+              ) : (
+                <div className="bg-linear-to-r from-orange-500/20 to-red-500/20 border-orange-500/30 p-4 rounded-2xl">
+                  <div className="flex items-center justify-center gap-2 text-orange-600 font-bold mb-3">
+                    <FaExclamationTriangle className="w-5 h-5" />
+                    Premium Status: UPDATING...
+                  </div>
+                  <p className="text-sm text-base-content/70 mb-3">
+                    Your payment was successful, but your premium status is still updating. This usually takes a few seconds.
+                  </p>
+                  <button
+                    onClick={handleManualRefresh}
+                    disabled={isRefreshing}
+                    className="btn btn-sm btn-primary gap-2"
+                  >
+                    {isRefreshing ? (
+                      <>
+                        <span className="loading loading-spinner loading-xs"></span>
+                        Refreshing...
+                      </>
+                    ) : (
+                      <>
+                        <FaSync className="w-3 h-3" />
+                        Refresh Status
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </motion.div> */}
           </div>
         </motion.div>
 
@@ -234,7 +262,7 @@ const PaymentSuccess = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
               <span className="text-base-content/60">Amount Paid:</span>
-              <p className="font-bold text-base-content">৳1,500</p>
+              <p className="font-bold text-base-content">৳1500</p>
             </div>
             <div>
               <span className="text-base-content/60">Plan:</span>
@@ -257,7 +285,7 @@ const PaymentSuccess = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 1.4 }}
-          className="mt-8 p-6 bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-pink-500/10 rounded-2xl border border-purple-500/20"
+          className="mt-8 p-6 bg-linear-to-r from-purple-500/10 via-blue-500/10 to-pink-500/10 rounded-2xl border border-purple-500/20"
         >
           <h4 className="text-xl font-bold text-base-content mb-2">
             Thank You for Choosing Premium! 🙏

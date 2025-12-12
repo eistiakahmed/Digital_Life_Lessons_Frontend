@@ -47,6 +47,7 @@ const Register = () => {
             email: data.email,
             image: data.image,
             isPremium: false,
+            role: 'user',
           };
 
           await axios.post('/user', userInfo);
@@ -69,12 +70,13 @@ const Register = () => {
           name: user?.displayName,
           email: user?.email,
           image: user?.photoURL,
-          isPremium: true,
+          isPremium: false,
+          role: 'user',
         };
 
-        await axios.post('/users', userInfo);
+        await axios.post('/user', userInfo);
 
-        toast.success('Logged in with Google');
+        toast.success('Account created with Google');
         navigate(location?.state || '/');
       })
       .catch((err) => toast.error(err.message));
@@ -234,7 +236,7 @@ const Register = () => {
                   type="text"
                   {...register('image', { required: true })}
                   className="input input-bordered w-full bg-base-100 dark:bg-base-200 border-2 border-base-300 dark:border-base-content/20 focus:border-green-500 focus:outline-none transition-all"
-                  placeholder="https://example.com/photo.jpg"
+                  placeholder="https://your-image-url.com/photo.jpg"
                 />
                 {errors.image?.type === 'required' && (
                   <p className="text-error text-sm mt-1">

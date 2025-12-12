@@ -4,7 +4,7 @@ import { FaHome, FaSearch, FaArrowLeft } from 'react-icons/fa';
 
 const NotFound = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 flex items-center justify-center px-4">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden opacity-30">
         <motion.div
@@ -32,7 +32,7 @@ const NotFound = () => {
           transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
           className="mb-8"
         >
-          <h1 className="text-9xl md:text-[12rem] font-extrabold bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent leading-none">
+          <h1 className="text-9xl md:text-[12rem] font-extrabold bg-linear-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent leading-none">
             404
           </h1>
         </motion.div>

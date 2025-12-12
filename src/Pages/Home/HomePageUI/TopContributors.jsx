@@ -130,7 +130,7 @@ const TopContributors = () => {
                 <div className="pt-12 pb-6 text-center">
                   <div className="relative inline-block">
                     <img
-                      src={contributor.image || '/default-avatar.png'}
+                      src={contributor.image || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(contributor.name || 'User') + '&background=10b981&color=fff'}
                       alt={contributor.name}
                       className="w-24 h-24 rounded-full mx-auto border-4 border-white shadow-lg"
                     />

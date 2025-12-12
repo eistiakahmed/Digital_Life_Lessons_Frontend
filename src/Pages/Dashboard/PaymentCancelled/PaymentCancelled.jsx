@@ -30,7 +30,7 @@ const PaymentCancelled = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-red-900/20 dark:to-orange-900/20 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-linear-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-red-900/20 dark:to-orange-900/20 flex items-center justify-center px-4">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden opacity-30">
         <motion.div
@@ -58,7 +58,7 @@ const PaymentCancelled = () => {
           transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
           className="mb-8"
         >
-          <div className="w-32 h-32 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+          <div className="w-32 h-32 bg-linear-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
             <FaTimes className="w-16 h-16 text-white" />
           </div>
         </motion.div>
@@ -70,7 +70,7 @@ const PaymentCancelled = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mb-12"
         >
-          <h1 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent mb-6">
+          <h1 className="text-5xl md:text-6xl font-extrabold bg-linear-to-r from-red-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent mb-6">
             Payment Cancelled
           </h1>
           <div className="bg-base-100/80 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-red-200/50 mb-8">
@@ -156,7 +156,7 @@ const PaymentCancelled = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.2 }}
-          className="bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 p-8 rounded-3xl border border-blue-500/20 mb-8"
+          className="bg-linear-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 p-8 rounded-3xl border border-blue-500/20 mb-8"
         >
           <h3 className="text-2xl font-bold text-base-content mb-4">
             Continue with Free Features
@@ -221,7 +221,7 @@ const PaymentCancelled = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 1.6 }}
-          className="mt-8 p-6 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-2xl border border-yellow-500/20"
+          className="mt-8 p-6 bg-linear-to-r from-yellow-500/10 to-orange-500/10 rounded-2xl border border-yellow-500/20"
         >
           <h4 className="text-xl font-bold text-base-content mb-2">
             Your Journey Continues! 🌟

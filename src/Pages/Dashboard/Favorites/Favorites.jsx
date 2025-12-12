@@ -250,7 +250,7 @@ const Favorites = () => {
                   <div className="col-span-2">
                     <div className="flex items-center gap-2">
                       <img
-                        src={favorite.lesson?.authorImage || '/default-avatar.png'}
+                        src={favorite.lesson?.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(favorite.lesson?.authorName || 'User') + '&background=6366f1&color=fff'}
                         alt={favorite.lesson?.authorName}
                         className="w-8 h-8 rounded-full"
                       />

@@ -131,7 +131,7 @@ const FeaturedLessons = () => {
                 {/* Author Info */}
                 <div className="flex items-center gap-3 mb-4">
                   <img
-                    src={lesson.authorImage || '/default-avatar.png'}
+                    src={lesson.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(lesson.authorName || 'User') + '&background=6366f1&color=fff'}
                     alt={lesson.authorName}
                     className="w-8 h-8 rounded-full"
                   />

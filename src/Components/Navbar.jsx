@@ -6,7 +6,10 @@ import { FaSignOutAlt, FaTachometerAlt, FaUser } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const Navbar = () => {
-  const { user, LogoutUser } = useAuth();
+  const { user, userDB, LogoutUser } = useAuth();
+  
+  // Check if user is admin
+  const isAdmin = userDB?.role === 'admin';
 
   const handleLogout = () => {
     LogoutUser()
@@ -68,18 +71,38 @@ const Navbar = () => {
           Public Lessons
         </NavLink>
       </li>
-      <li>
-        <NavLink
-          to="/pricing"
-          className={({ isActive }) =>
-            isActive
-              ? 'text-primary font-semibold border-2 border-primary rounded-4xl'
-              : 'font-semibold'
-          }
-        >
-          Upgrade
-        </NavLink>
-      </li>
+      
+      {/* Only show Pricing/Upgrade link for non-admin users */}
+      {!isAdmin && (
+        <li>
+          <NavLink
+            to="/pricing"
+            className={({ isActive }) =>
+              isActive
+                ? 'text-primary font-semibold border-2 border-primary rounded-4xl'
+                : 'font-semibold'
+            }
+          >
+            Upgrade
+          </NavLink>
+        </li>
+      )}
+      
+      {/* Show Admin Dashboard link for admin users */}
+      {isAdmin && (
+        <li>
+          <NavLink
+            to="/dashboard/admin"
+            className={({ isActive }) =>
+              isActive
+                ? 'text-error font-semibold border-2 border-error rounded-4xl'
+                : 'font-semibold text-error'
+            }
+          >
+            Admin Panel
+          </NavLink>
+        </li>
+      )}
     </>
   );
 

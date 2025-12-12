@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import { Navigate } from 'react-router';
 import useAuth from '../../hooks/useAuth';
 import useAxios from '../../hooks/useAxios';
 import {
@@ -15,6 +16,7 @@ import {
   FaFire,
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import { useState } from 'react';
 
 const features = [
   {
@@ -76,7 +78,7 @@ const features = [
 ];
 
 const PremiumView = () => (
-  <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-purple-50 via-blue-50 to-pink-50">
+  <div className="min-h-[70vh] flex items-center justify-center ">
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -90,7 +92,7 @@ const PremiumView = () => (
   </div>
 );
 
-const FreeView = ({ handleUpgrade }) => (
+const FreeView = ({ handleUpgrade, isProcessing }) => (
   <div className="min-h-screen py-12 px-4">
     <div className="max-w-7xl mx-auto">
       <motion.div
@@ -146,12 +148,22 @@ const FreeView = ({ handleUpgrade }) => (
 
           <motion.button
             onClick={handleUpgrade}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="btn w-full bg-linear-to-r from-purple-500 via-blue-500 to-pink-500 text-white border-none text-lg font-bold"
+            disabled={isProcessing}
+            whileHover={{ scale: isProcessing ? 1 : 1.05 }}
+            whileTap={{ scale: isProcessing ? 1 : 0.95 }}
+            className={`btn w-full bg-linear-to-r from-purple-500 via-blue-500 to-pink-500 text-white border-none text-lg font-bold ${isProcessing ? 'loading' : ''}`}
           >
-            Upgrade to Premium
-            <FaRocket className="w-5 h-5 ml-2" />
+            {isProcessing ? (
+              <>
+                <span className="loading loading-spinner loading-sm"></span>
+                Processing...
+              </>
+            ) : (
+              <>
+                Upgrade to Premium
+                <FaRocket className="w-5 h-5 ml-2" />
+              </>
+            )}
           </motion.button>
         </motion.div>
       </div>
@@ -160,11 +172,15 @@ const FreeView = ({ handleUpgrade }) => (
 );
 
 const Pricing = () => {
-  const { user } = useAuth();
+  const { user, userDB, loading } = useAuth();
   const axios = useAxios();
-  
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  
+  // Redirect admin users to dashboard - they don't need pricing
+  if (!loading && userDB?.role === 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   const { data: currentUser, isLoading } = useQuery({
     queryKey: ['currentUser', user?.email],
     queryFn: async () => {
@@ -176,22 +192,48 @@ const Pricing = () => {
   });
 
   const handleUpgrade = async () => {
-    if (!user?.email) return;
+    if (!user?.email) {
+      toast.error('Please log in to upgrade to premium.');
+      return;
+    }
+
+    setIsProcessing(true);
+    
     try {
+      toast.loading('Redirecting to payment...', { id: 'payment' });
+      
       const res = await axios.post('/create-checkout-session', {
         authorEmail: user.email,
       });
-      window.location.href = res.data.url;
+      
+      toast.dismiss('payment');
+      
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        throw new Error('No payment URL received');
+      }
     } catch (err) {
-      console.log(err);
-      toast.error('Failed to initiate payment.');
+      toast.dismiss('payment');
+      setIsProcessing(false);
+      console.error('Payment error:', err);
+      
+      if (err.response?.status === 404) {
+        toast.error('Payment service not available. Please try again later.');
+      } else if (err.response?.status === 500) {
+        toast.error('Server error. Please contact support.');
+      } else if (err.code === 'NETWORK_ERROR' || !err.response) {
+        toast.error('Cannot connect to payment service. Please check if the backend server is running.');
+      } else {
+        toast.error(err.response?.data?.message || 'Failed to initiate payment. Please try again.');
+      }
     }
   };
 
-  if (isLoading) {
+  if (loading || isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <p>Loading...</p>
+        <div className="loading loading-spinner loading-lg"></div>
       </div>
     );
   }
@@ -199,7 +241,7 @@ const Pricing = () => {
   return currentUser?.isPremium ? (
     <PremiumView />
   ) : (
-    <FreeView handleUpgrade={handleUpgrade} />
+    <FreeView handleUpgrade={handleUpgrade} isProcessing={isProcessing} />
   );
 };
 

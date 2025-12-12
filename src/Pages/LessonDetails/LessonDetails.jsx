@@ -285,7 +285,7 @@ const LessonDetails = () => {
             <div className="bg-base-200 p-6 rounded-2xl mb-8">
               <div className="flex items-center gap-4">
                 <img
-                  src={lesson.authorImage || '/default-avatar.png'}
+                  src={lesson.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(lesson.authorName || 'User') + '&background=6366f1&color=fff'}
                   alt={lesson.authorName}
                   className="w-16 h-16 rounded-full"
                 />
@@ -374,7 +374,7 @@ const LessonDetails = () => {
                 <form onSubmit={handleComment} className="mb-8">
                   <div className="flex gap-4">
                     <img
-                      src={user.photoURL || '/default-avatar.png'}
+                      src={user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'User') + '&background=6366f1&color=fff'}
                       alt={user.displayName}
                       className="w-10 h-10 rounded-full"
                     />
@@ -412,7 +412,7 @@ const LessonDetails = () => {
                 {comments.map((comment) => (
                   <div key={comment._id} className="flex gap-4">
                     <img
-                      src={comment.authorImage || '/default-avatar.png'}
+                      src={comment.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(comment.authorName || 'User') + '&background=6366f1&color=fff'}
                       alt={comment.authorName}
                       className="w-10 h-10 rounded-full"
                     />

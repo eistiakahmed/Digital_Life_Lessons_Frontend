@@ -27,7 +27,6 @@ const Profile = () => {
     photoURL: user?.photoURL || '',
   });
 
-  // Fetch current user data
   const { data: currentUser, isLoading: userLoading } = useQuery({
     queryKey: ['currentUser', user?.email],
     queryFn: async () => {
@@ -38,7 +37,6 @@ const Profile = () => {
     enabled: !!user?.email,
   });
 
-  // Fetch user's public lessons
   const { data: userLessons = [], isLoading: lessonsLoading } = useQuery({
     queryKey: ['userLessons', user?.email],
     queryFn: async () => {
@@ -49,7 +47,6 @@ const Profile = () => {
     enabled: !!user?.email,
   });
 
-  // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async (updatedData) => {
       await updateUserProfile(updatedData.displayName, updatedData.photoURL);
@@ -98,36 +95,40 @@ const Profile = () => {
       label: 'Lessons Created',
       value: userLessons.length,
       icon: <FaBookOpen className="w-6 h-6 text-blue-500" />,
-      color: 'from-blue-500 to-cyan-500',
     },
     {
       label: 'Total Views',
       value: userLessons.reduce((sum, lesson) => sum + (lesson.views || 0), 0),
       icon: <FaEye className="w-6 h-6 text-green-500" />,
-      color: 'from-green-500 to-emerald-500',
     },
     {
       label: 'Total Likes',
-      value: userLessons.reduce((sum, lesson) => sum + (lesson.likes || 0), 0),
+      value: userLessons.reduce(
+        (sum, lesson) => sum + (lesson.likesCount || 0),
+        0
+      ),
       icon: <FaHeart className="w-6 h-6 text-red-500" />,
-      color: 'from-red-500 to-pink-500',
     },
   ];
 
   return (
     <div className="min-h-screen bg-base-100 p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Profile Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="bg-gradient-to-r from-purple-500 via-blue-500 to-pink-500 p-8 rounded-3xl text-white shadow-2xl"
+          className="bg-linear-to-r from-purple-500 via-blue-500 to-pink-500 p-8 rounded-3xl text-white shadow-2xl"
         >
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="relative">
               <img
-                src={user?.photoURL || '/default-avatar.png'}
+                src={
+                  user?.photoURL ||
+                  'https://ui-avatars.com/api/?name=' +
+                    encodeURIComponent(user?.displayName || 'User') +
+                    '&background=6366f1&color=fff'
+                }
                 alt={user?.displayName}
                 className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
               />
@@ -218,7 +219,9 @@ const Profile = () => {
               className="bg-base-100 p-6 rounded-2xl shadow-lg border border-base-300"
             >
               <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-full bg-gradient-to-r ${stat.color}`}>
+                <div
+                  className={`p-3 rounded-full border border-gray-100 shadow-md`}
+                >
                   {stat.icon}
                 </div>
                 <div>
@@ -283,7 +286,7 @@ const Profile = () => {
                       </span>
                       <span className="flex items-center gap-1">
                         <FaHeart className="w-3 h-3" />
-                        {lesson.likes || 0}
+                        {lesson.likesCount || 0}
                       </span>
                     </div>
                     <span className="flex items-center gap-1">

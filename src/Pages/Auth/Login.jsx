@@ -47,6 +47,7 @@ const Login = () => {
          email: user.email,
          image: user.photoURL,
          isPremium: false,
+         role: 'user',
        };
 
        await axios.post('/user', userInfo);

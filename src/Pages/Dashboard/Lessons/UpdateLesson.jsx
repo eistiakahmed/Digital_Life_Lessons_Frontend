@@ -357,7 +357,7 @@ const UpdateLesson = () => {
               {...register('image')}
               type="url"
               className="input input-bordered w-full"
-              placeholder="https://example.com/image.jpg"
+              placeholder="https://your-image-url.com/image.jpg"
             />
             <div className="label">
               <span className="label-text-alt text-base-content/60">

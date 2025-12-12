@@ -53,7 +53,10 @@ const DashboardHome = () => {
 
   // Calculate stats
   const totalViews = userLessons.reduce((sum, lesson) => sum + (lesson.views || 0), 0);
-  const totalLikes = userLessons.reduce((sum, lesson) => sum + (lesson.likes || 0), 0);
+  const totalLikes = userLessons.reduce(
+    (sum, lesson) => sum + (lesson.likesCount || 0),
+    0
+  );
   const recentLessons = userLessons
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 5);
@@ -156,7 +159,12 @@ const DashboardHome = () => {
           </div>
           <div className="hidden md:block">
             <img
-              src={user?.photoURL || '/default-avatar.png'}
+              src={
+                user?.photoURL ||
+                'https://ui-avatars.com/api/?name=' +
+                  encodeURIComponent(user?.displayName || 'User') +
+                  '&background=6366f1&color=fff'
+              }
               alt={user?.displayName}
               className="w-20 h-20 rounded-full border-4 border-white/30"
             />
@@ -275,7 +283,7 @@ const DashboardHome = () => {
                       </span>
                       <span className="flex items-center gap-1">
                         <FaHeart className="w-3 h-3" />
-                        {lesson.likes || 0}
+                        {lesson.likesCount || 0}
                       </span>
                     </div>
                   </div>
@@ -326,7 +334,7 @@ const DashboardHome = () => {
           </div>
 
           {!currentUser?.isPremium && (
-            <div className="mt-6 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-xl border border-yellow-500/20">
+            <div className="mt-6 p-4 bg-linear-to-r from-yellow-500/10 to-orange-500/10 rounded-xl border border-yellow-500/20">
               <h3 className="font-bold text-base-content mb-2">
                 Upgrade to Premium
               </h3>
