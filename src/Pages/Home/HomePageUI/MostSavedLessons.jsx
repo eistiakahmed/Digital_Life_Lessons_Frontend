@@ -23,6 +23,8 @@ const MostSavedLessons = () => {
       const res = await axios.get('/lessons/most-saved');
       return res.data.slice(0, 6); // Show top 6 most saved lessons
     },
+    staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
+    cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });
 
   if (isLoading) {
@@ -149,15 +151,20 @@ const MostSavedLessons = () => {
 
                 {/* Author Info */}
                 <div className="flex items-center gap-3 mb-4">
-                  <img
-                    src={lesson.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(lesson.authorName || 'User') + '&background=6366f1&color=fff'}
-                    alt={lesson.authorName}
-                    className="w-8 h-8 rounded-full"
-                  />
+                  <Link to={`/profile/${lesson.authorEmail}`}>
+                    <img
+                      src={lesson.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(lesson.authorName || 'User') + '&background=6366f1&color=fff'}
+                      alt={lesson.authorName}
+                      className="w-8 h-8 rounded-full hover:ring-2 hover:ring-primary transition-all cursor-pointer"
+                    />
+                  </Link>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-base-content">
+                    <Link 
+                      to={`/profile/${lesson.authorEmail}`}
+                      className="text-sm font-medium text-base-content hover:text-primary transition-colors"
+                    >
                       {lesson.authorName}
-                    </p>
+                    </Link>
                     <p className="text-xs text-base-content/60 flex items-center gap-1">
                       <FaCalendarAlt className="w-3 h-3" />
                       {new Date(lesson.createdAt).toLocaleDateString()}

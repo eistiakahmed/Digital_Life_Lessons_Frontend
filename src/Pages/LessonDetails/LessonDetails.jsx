@@ -413,17 +413,22 @@ const LessonDetails = () => {
               <div className="space-y-6">
                 {comments.map((comment) => (
                   <div key={comment._id} className="flex gap-4">
-                    <img
-                      src={comment.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(comment.authorName || 'User') + '&background=6366f1&color=fff'}
-                      alt={comment.authorName}
-                      className="w-10 h-10 rounded-full"
-                    />
+                    <Link to={`/profile/${comment.authorEmail}`}>
+                      <img
+                        src={comment.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(comment.authorName || 'User') + '&background=6366f1&color=fff'}
+                        alt={comment.authorName}
+                        className="w-10 h-10 rounded-full hover:ring-2 hover:ring-primary transition-all cursor-pointer"
+                      />
+                    </Link>
                     <div className="flex-1">
                       <div className="bg-base-200 p-4 rounded-2xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="font-medium text-base-content">
+                          <Link 
+                            to={`/profile/${comment.authorEmail}`}
+                            className="font-medium text-base-content hover:text-primary transition-colors"
+                          >
                             {comment.authorName}
-                          </span>
+                          </Link>
                           <span className="text-xs text-base-content/60">
                             {new Date(comment.createdAt).toLocaleDateString()}
                           </span>

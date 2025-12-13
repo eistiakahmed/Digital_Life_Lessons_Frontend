@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import useAuth from '../../../hooks/useAuth';
 import useAxios from '../../../hooks/useAxios';
 import toast from 'react-hot-toast';
+import { invalidateUserQueries } from '../../../utils/cacheUtils';
 import {
   FaUser,
   FaEdit,
@@ -72,7 +73,8 @@ const AdminProfile = () => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['user']);
+      // Invalidate all user-related queries to ensure UI updates everywhere
+      invalidateUserQueries(queryClient);
       toast.success('Profile updated successfully!');
       setIsEditing(false);
     },

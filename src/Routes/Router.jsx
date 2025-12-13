@@ -23,6 +23,7 @@ import ManageLessons from '../Pages/Dashboard/Admin/ManageLessons';
 import ReportedLessons from '../Pages/Dashboard/Admin/ReportedLessons';
 import AdminProfile from '../Pages/Dashboard/Admin/AdminProfile';
 import AdminRoutes from './AdminRoutes/AdminRoutes';
+import PublicProfile from '../Pages/PublicProfile/PublicProfile';
 
 export const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
       {
         path: '/register',
         element: <Register />,
+      },
+      {
+        path: '/profile/:email',
+        element: <PublicProfile />,
       },
       {
         path: '/payment/success',

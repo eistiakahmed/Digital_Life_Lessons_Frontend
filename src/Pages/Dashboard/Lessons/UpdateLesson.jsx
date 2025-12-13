@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import useAuth from '../../../hooks/useAuth';
 import useAxios from '../../../hooks/useAxios';
 import toast from 'react-hot-toast';
+import { invalidateLessonQueries } from '../../../utils/cacheUtils';
 import {
   FaArrowLeft,
   FaSave,
@@ -111,8 +112,9 @@ const UpdateLesson = () => {
     },
     onSuccess: () => {
       toast.success('Lesson updated successfully!');
+      // Invalidate lesson-related queries to update UI everywhere
+      invalidateLessonQueries(queryClient);
       queryClient.invalidateQueries(['lesson', id]);
-      queryClient.invalidateQueries(['myLessons', user?.email]);
       navigate('/dashboard/my_lessons');
     },
     onError: (error) => {

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import useAuth from '../../../hooks/useAuth';
 import useAxios from '../../../hooks/useAxios';
+import { invalidateLessonQueries } from '../../../utils/cacheUtils';
 
 const categories = [
   'Personal Growth',
@@ -17,6 +19,7 @@ const privacyOptions = ['Public', 'Private'];
 const AddLesson = () => {
   const { user } = useAuth();
   const axios = useAxios();
+  const queryClient = useQueryClient();
 
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -45,40 +48,50 @@ const AddLesson = () => {
     fetchUserStatus();
   }, [user?.email, axios]);
 
-  const onSubmit = async (data) => {
-    if (data.accessLevel === 'Premium' && !isPremiumUser) {
-      return toast.error('You need Premium access to create Premium lessons!');
-    }
+  // Create lesson mutation
+  const createLessonMutation = useMutation({
+    mutationFn: async (data) => {
+      if (data.accessLevel === 'Premium' && !isPremiumUser) {
+        throw new Error('You need Premium access to create Premium lessons!');
+      }
 
-    const finalLesson = {
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      emotion: data.emotion,
-      privacy: data.privacy,
-      accessLevel: data.accessLevel || 'Free',
-      image: data.image || null,
-      createdAt: new Date(),
-      authorName: user?.displayName,
-      authorEmail: user?.email,
-      authorImage: user?.photoURL,
-      isFeatured: false,
-      views: 0,
-      favorites: 0,
-    };
+      const finalLesson = {
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        emotion: data.emotion,
+        privacy: data.privacy,
+        accessLevel: data.accessLevel || 'Free',
+        image: data.image || null,
+        createdAt: new Date(),
+        authorName: user?.displayName,
+        authorEmail: user?.email,
+        authorImage: user?.photoURL,
+        isFeatured: false,
+        views: 0,
+        favorites: 0,
+      };
 
-    try {
-      const res = await axios.post('/lessons', finalLesson);
+      return axios.post('/lessons', finalLesson);
+    },
+    onSuccess: (res) => {
       if (res.data.insertedId) {
         toast.success('Lesson Created Successfully!');
         reset();
+        // Invalidate lesson-related queries to update UI everywhere
+        invalidateLessonQueries(queryClient);
       } else {
         toast.error('Failed to create lesson');
       }
-    } catch (err) {
-      console.log(err);
-      toast.error('Something went wrong!');
-    }
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Something went wrong!');
+      console.error(error);
+    },
+  });
+
+  const onSubmit = (data) => {
+    createLessonMutation.mutate(data);
   };
 
   if (loading) {
@@ -197,8 +210,12 @@ const AddLesson = () => {
         </div>
 
         {/* Submit */}
-        <button type="submit" className="btn btn-primary w-full font-bold">
-          Create Lesson
+        <button 
+          type="submit" 
+          disabled={createLessonMutation.isPending}
+          className="btn btn-primary w-full font-bold"
+        >
+          {createLessonMutation.isPending ? 'Creating...' : 'Create Lesson'}
         </button>
       </form>
     </div>

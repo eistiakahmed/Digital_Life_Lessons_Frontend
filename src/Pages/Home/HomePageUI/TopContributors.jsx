@@ -15,14 +15,18 @@ import {
 const TopContributors = () => {
   const axios = useAxios();
 
-  // Fetch top contributors
+  
   const { data: topContributors = [], isLoading } = useQuery({
     queryKey: ['topContributors'],
     queryFn: async () => {
       const res = await axios.get('/users/top-contributors');
-      return res.data.slice(0, 6); // Show top 6 contributors
+      return res.data.slice(0, 6);
     },
+    staleTime: 5 * 60 * 1000, 
+    cacheTime: 10 * 60 * 1000, 
   });
+
+  console.log(topContributors?.name);
 
   if (isLoading) {
     return (
@@ -35,7 +39,7 @@ const TopContributors = () => {
   }
 
   if (topContributors.length === 0) {
-    return null; // Don't show section if no contributors
+    return null; 
   }
 
   const getRankIcon = (index) => {
@@ -100,11 +104,11 @@ const TopContributors = () => {
               whileHover={{ y: -5, scale: 1.02 }}
               className={`bg-base-100 rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border-2 ${
                 index === 0 
-                  ? 'border-yellow-500/50 bg-gradient-to-br from-yellow-50/50 to-orange-50/50' 
+                  ? 'border-yellow-500/50 bg-linear-to-br from-yellow-50/50 to-orange-50/50' 
                   : index === 1 
-                  ? 'border-gray-400/50 bg-gradient-to-br from-gray-50/50 to-slate-50/50'
+                  ? 'border-gray-400/50 bg-linear-to-br from-gray-50/50 to-slate-50/50'
                   : index === 2
-                  ? 'border-amber-600/50 bg-gradient-to-br from-amber-50/50 to-orange-50/50'
+                  ? 'border-amber-600/50 bg-linear-to-br from-amber-50/50 to-orange-50/50'
                   : 'border-base-300'
               }`}
             >
@@ -130,7 +134,7 @@ const TopContributors = () => {
                 <div className="pt-12 pb-6 text-center">
                   <div className="relative inline-block">
                     <img
-                      src={contributor.image || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(contributor.name || 'User') + '&background=10b981&color=fff'}
+                      src={contributor.image}
                       alt={contributor.name}
                       className="w-24 h-24 rounded-full mx-auto border-4 border-white shadow-lg"
                     />
@@ -167,7 +171,7 @@ const TopContributors = () => {
                       <FaEye className="w-4 h-4 text-green-500" />
                     </div>
                     <p className="text-2xl font-bold text-base-content">
-                      {contributor.totalViews || Math.floor(Math.random() * 10000)}
+                      {contributor.totalViews}
                     </p>
                     <p className="text-xs text-base-content/60">Views</p>
                   </div>
@@ -177,7 +181,7 @@ const TopContributors = () => {
                       <FaHeart className="w-4 h-4 text-red-500" />
                     </div>
                     <p className="text-2xl font-bold text-base-content">
-                      {contributor.totalLikes || Math.floor(Math.random() * 1000)}
+                      {contributor.totalLikes}
                     </p>
                     <p className="text-xs text-base-content/60">Likes</p>
                   </div>
@@ -210,7 +214,7 @@ const TopContributors = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-center mt-12"
         >
-          <div className="bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-pink-500/10 p-8 rounded-3xl border border-purple-500/20 max-w-2xl mx-auto">
+          <div className="bg-linear-to-r from-purple-500/10 via-blue-500/10 to-pink-500/10 p-8 rounded-3xl border border-purple-500/20 max-w-2xl mx-auto">
             <h3 className="text-2xl font-bold text-base-content mb-4">
               Want to be featured?
             </h3>

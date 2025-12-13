@@ -16,6 +16,8 @@ import {
   FaCalendarAlt,
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import { invalidateUserQueries } from '../../../utils/cacheUtils';
+
 
 const Profile = () => {
   const { user, updateUserProfile } = useAuth();
@@ -51,14 +53,15 @@ const Profile = () => {
     mutationFn: async (updatedData) => {
       await updateUserProfile(updatedData.displayName, updatedData.photoURL);
       return axios.put(`/user/${user.email}`, {
-        name: updatedData.displayName,
-        image: updatedData.photoURL,
+        displayName: updatedData.displayName,
+        photoURL: updatedData.photoURL,
       });
     },
     onSuccess: () => {
       toast.success('Profile updated successfully!');
       setIsEditing(false);
-      queryClient.invalidateQueries(['currentUser']);
+      
+      invalidateUserQueries(queryClient);
     },
     onError: (error) => {
       toast.error('Failed to update profile');

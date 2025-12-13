@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import useAuth from '../../../hooks/useAuth';
 import useAxios from '../../../hooks/useAxios';
 import toast from 'react-hot-toast';
+import { invalidateLessonQueries } from '../../../utils/cacheUtils';
 import { Link } from 'react-router'; 
 import { AiFillEye, AiOutlineEdit, AiFillDelete } from 'react-icons/ai';
 import Swal from 'sweetalert2';
@@ -59,7 +60,8 @@ const MyLessons = () => {
   const deleteLessonMutation = useMutation({
     mutationFn: (id) => axios.delete(`/lessons/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries(['myLessons', user?.email]);
+      // Invalidate lesson-related queries to update UI everywhere
+      invalidateLessonQueries(queryClient);
       toast.success('Lesson deleted successfully!');
     },
   });

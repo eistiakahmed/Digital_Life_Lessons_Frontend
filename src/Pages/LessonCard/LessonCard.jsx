@@ -82,20 +82,25 @@ const LessonCard = ({ lesson }) => {
 
         {/* Author Info */}
         <div className="flex items-center gap-3 mb-4">
-          <img
-            src={
-              lesson.authorImage ||
-              'https://ui-avatars.com/api/?name=' +
-                encodeURIComponent(lesson.authorName || 'User') +
-                '&background=6366f1&color=fff'
-            }
-            alt={lesson.authorName}
-            className="w-10 h-10 rounded-full border border-gray-100 shadow-md"
-          />
+          <Link to={`/profile/${lesson.authorEmail}`}>
+            <img
+              src={
+                lesson.authorImage ||
+                'https://ui-avatars.com/api/?name=' +
+                  encodeURIComponent(lesson.authorName || 'User') +
+                  '&background=6366f1&color=fff'
+              }
+              alt={lesson.authorName}
+              className="w-10 h-10 rounded-full border border-gray-100 shadow-md hover:ring-2 hover:ring-primary transition-all cursor-pointer"
+            />
+          </Link>
           <div className="flex-1">
-            <p className="text-sm font-medium text-base-content">
+            <Link 
+              to={`/profile/${lesson.authorEmail}`}
+              className="text-sm font-medium text-base-content hover:text-primary transition-colors"
+            >
               {lesson.authorName}
-            </p>
+            </Link>
             <p className="text-xs text-base-content/60 flex items-center gap-1">
               <FaCalendarAlt className="w-3 h-3" />
               {new Date(lesson.createdAt).toLocaleDateString()}

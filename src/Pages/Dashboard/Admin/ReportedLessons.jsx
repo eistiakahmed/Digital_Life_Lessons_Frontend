@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router';
 import useAxios from '../../../hooks/useAxios';
 import toast from 'react-hot-toast';
+import { invalidateLessonQueries } from '../../../utils/cacheUtils';
 import {
   FaFlag,
   FaTrash,
@@ -58,6 +59,8 @@ const ReportedLessons = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(['reportedLessons']);
       queryClient.invalidateQueries(['allLessons']);
+      // Invalidate lesson-related queries to update UI everywhere
+      invalidateLessonQueries(queryClient);
       toast.success('Lesson deleted successfully!');
     },
     onError: (error) => {
