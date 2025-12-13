@@ -39,6 +39,8 @@ const LessonDetails = () => {
     },
   });
 
+  console.log(lesson)
+
   // Fetch current user
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser', user?.email],
@@ -276,7 +278,7 @@ const LessonDetails = () => {
                 </span>
                 <span className="flex items-center gap-2">
                   <FaEye className="w-4 h-4" />
-                  {Math.floor(Math.random() * 10000)} views
+                  {Math.floor(Math.random() * 10000)}  // views
                 </span>
               </div>
             </div>

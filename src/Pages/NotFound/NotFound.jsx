@@ -48,7 +48,8 @@ const NotFound = () => {
             Oops! Page Not Found
           </h2>
           <p className="text-lg text-base-content/70 mb-2">
-            The page you're looking for seems to have wandered off into the digital wilderness.
+            The page you're looking for seems to have wandered off into the
+            digital wilderness.
           </p>
           <p className="text-base-content/60">
             Don't worry, even the best explorers sometimes take a wrong turn!
@@ -71,7 +72,7 @@ const NotFound = () => {
             >
               <FaSearch className="w-32 h-32 text-base-content/30" />
             </motion.div>
-            
+
             {/* Floating Question Marks */}
             <motion.div
               animate={{ y: [-10, 10, -10] }}
@@ -82,14 +83,24 @@ const NotFound = () => {
             </motion.div>
             <motion.div
               animate={{ y: [10, -10, 10] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: 0.5,
+              }}
               className="absolute bottom-8 left-8 text-3xl text-base-content/20"
             >
               ?
             </motion.div>
             <motion.div
               animate={{ y: [-5, 15, -5] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+              transition={{
+                duration: 2.8,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: 1,
+              }}
               className="absolute top-12 left-4 text-2xl text-base-content/20"
             >
               ?
@@ -111,7 +122,7 @@ const NotFound = () => {
             <FaHome className="w-5 h-5" />
             Go Home
           </Link>
-          
+
           <button
             onClick={() => window.history.back()}
             className="btn btn-outline btn-lg gap-3 hover:scale-105 transition-transform duration-200"
@@ -119,7 +130,7 @@ const NotFound = () => {
             <FaArrowLeft className="w-5 h-5" />
             Go Back
           </button>
-          
+
           <Link
             to="/public_lessons"
             className="btn btn-secondary btn-lg gap-3 hover:scale-105 transition-transform duration-200"
@@ -165,19 +176,6 @@ const NotFound = () => {
               Pricing
             </Link>
           </div>
-        </motion.div>
-
-        {/* Fun Fact */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.2 }}
-          className="mt-8 p-4 bg-base-100/50 backdrop-blur-sm rounded-2xl border border-base-content/10"
-        >
-          <p className="text-sm text-base-content/60">
-            💡 <strong>Fun Fact:</strong> The HTTP 404 error was named after room 404 at CERN, 
-            where the World Wide Web was invented!
-          </p>
         </motion.div>
       </motion.div>
     </div>

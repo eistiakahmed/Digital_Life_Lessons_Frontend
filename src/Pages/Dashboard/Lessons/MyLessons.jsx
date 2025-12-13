@@ -167,7 +167,7 @@ const MyLessons = () => {
                     <AiFillEye size={16} />
                   </Link>
                   <Link
-                    to={`/dashboard/update-lesson/${lesson._id}`}
+                    to={`/dashboard/update_lesson/${lesson._id}`}
                     className="btn btn-xs btn-warning"
                   >
                     <AiOutlineEdit size={16} />

@@ -12,13 +12,16 @@ import {
   FaCheckCircle,
 } from 'react-icons/fa';
 import useAxios from '../../hooks/useAxios';
+import { useState } from 'react';
+import { IoIosEye, IoIosEyeOff } from 'react-icons/io';
 
 const Login = () => {
   const { signInUser, signInGoogle } = useAuth();
-  const axios = useAxios()
+  const axios = useAxios();
+  const [textToggling, setTextToggling] = useState(false);
 
   const navigate = useNavigate();
-  const location = useLocation()
+  const location = useLocation();
   const {
     register,
     handleSubmit,
@@ -29,38 +32,37 @@ const Login = () => {
     signInUser(data.email, data.password)
       .then(() => {
         toast.success('Login Successfully');
-         navigate(location?.state || '/');
+        navigate(location?.state || '/');
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
         toast.error(error.message);
       });
   };
 
   const handleGoogleLogin = () => {
-   signInGoogle()
-     .then(async (result) => {
-       const user = result.user;
+    signInGoogle()
+      .then(async (result) => {
+        const user = result.user;
 
-       const userInfo = {
-         name: user.displayName,
-         email: user.email,
-         image: user.photoURL,
-         isPremium: false,
-         role: 'user',
-       };
+        const userInfo = {
+          name: user.displayName,
+          email: user.email,
+          image: user.photoURL,
+          isPremium: false,
+          role: 'user',
+        };
 
-       await axios.post('/user', userInfo);
+        await axios.post('/user', userInfo);
 
-       toast.success('Logged in with Google');
-       navigate(location?.state || '/');
-     })
-     .catch((err) => toast.error(err.message));
+        toast.success('Logged in with Google');
+        navigate(location?.state || '/');
+      })
+      .catch((err) => toast.error(err.message));
   };
 
   return (
     <div className="dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 flex items-center justify-center px-4 transition-all duration-500">
-      
       <div className="absolute inset-0 overflow-hidden opacity-30">
         <motion.div
           className="absolute top-20 left-10 w-72 h-72 bg-purple-400/30 rounded-full blur-3xl"
@@ -187,7 +189,7 @@ const Login = () => {
               </div>
 
               {/* Password Field */}
-              <div>
+              <div className='relative'>
                 <label className="label font-semibold text-base-content mb-2">
                   <span className="flex items-center gap-2">
                     <FaLock className="w-4 h-4 text-purple-500" />
@@ -195,7 +197,7 @@ const Login = () => {
                   </span>
                 </label>
                 <input
-                  type="password"
+                  type={textToggling ? 'text' : 'password'}
                   {...register('password', {
                     required: true,
                     minLength: 6,
@@ -205,6 +207,18 @@ const Login = () => {
                   className="input input-bordered w-full bg-base-100 dark:bg-base-200 border-2 border-base-300 dark:border-base-content/20 focus:border-purple-500 focus:outline-none transition-all"
                   placeholder="••••••••"
                 />
+
+                <button
+                  onClick={() => setTextToggling(!textToggling)}
+                  type="button"
+                  className="absolute right-3 top-10.5 text-base-content/60 hover:text-base-content transition-colors"
+                >
+                  {textToggling ? (
+                    <IoIosEyeOff size={22} />
+                  ) : (
+                    <IoIosEye size={22} />
+                  )}
+                </button>
                 {errors.password?.type === 'required' && (
                   <p className="text-error text-sm mt-1">
                     Password is required

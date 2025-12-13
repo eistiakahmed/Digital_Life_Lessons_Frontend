@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router';
 import useAuth from '../../hooks/useAuth';
 import useAxios from '../../hooks/useAxios';
+import LessonCard from '../LessonCard/LessonCard';
 import {
   FaSearch,
   FaFilter,
@@ -25,13 +26,7 @@ const categories = [
   'Mistakes Learned',
 ];
 
-const emotions = [
-  'All',
-  'Motivational',
-  'Sad',
-  'Realization',
-  'Gratitude',
-];
+const emotions = ['All', 'Motivational', 'Sad', 'Realization', 'Gratitude'];
 
 const sortOptions = [
   { value: 'newest', label: 'Newest First' },
@@ -43,7 +38,7 @@ const sortOptions = [
 const PublicLessons = () => {
   const { user } = useAuth();
   const axios = useAxios();
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedEmotion, setSelectedEmotion] = useState('All');
@@ -74,11 +69,14 @@ const PublicLessons = () => {
   // Filter and sort lessons
   const filteredLessons = lessons
     .filter((lesson) => {
-      const matchesSearch = lesson.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           lesson.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || lesson.category === selectedCategory;
-      const matchesEmotion = selectedEmotion === 'All' || lesson.emotion === selectedEmotion;
-      
+      const matchesSearch =
+        lesson.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lesson.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory =
+        selectedCategory === 'All' || lesson.category === selectedCategory;
+      const matchesEmotion =
+        selectedEmotion === 'All' || lesson.emotion === selectedEmotion;
+
       return matchesSearch && matchesCategory && matchesEmotion;
     })
     .sort((a, b) => {
@@ -99,135 +97,10 @@ const PublicLessons = () => {
   // Pagination
   const totalPages = Math.ceil(filteredLessons.length / lessonsPerPage);
   const startIndex = (currentPage - 1) * lessonsPerPage;
-  const paginatedLessons = filteredLessons.slice(startIndex, startIndex + lessonsPerPage);
-
-  const LessonCard = ({ lesson }) => {
-    const isPremiumLesson = lesson.accessLevel === 'Premium';
-    const canViewPremium = currentUser?.isPremium || lesson.authorEmail === user?.email;
-    const isBlurred = isPremiumLesson && !canViewPremium;
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className={`bg-base-100 rounded-2xl shadow-lg border border-base-300 overflow-hidden hover:shadow-xl transition-all duration-300 ${
-          isBlurred ? 'relative' : ''
-        }`}
-      >
-        {/* Premium Overlay */}
-        {isBlurred && (
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
-            <div className="text-center text-white p-6">
-              <FaLock className="w-12 h-12 mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-2">Premium Lesson</h3>
-              <p className="mb-4">Upgrade to view this exclusive content</p>
-              <Link
-                to="/pricing"
-                className="btn btn-warning btn-sm"
-              >
-                <FaCrown className="w-4 h-4 mr-2" />
-                Upgrade Now
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {/* Lesson Image */}
-        {lesson.image && (
-          <div className="h-48 overflow-hidden">
-            <img
-              src={lesson.image}
-              alt={lesson.title}
-              className={`w-full h-full object-cover ${isBlurred ? 'blur-sm' : ''}`}
-            />
-          </div>
-        )}
-
-        <div className={`p-6 ${isBlurred ? 'blur-sm' : ''}`}>
-          {/* Header */}
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex-1">
-              <h3 className="text-xl font-bold text-base-content mb-2 line-clamp-2">
-                {lesson.title}
-              </h3>
-              <p className="text-base-content/70 text-sm line-clamp-3 mb-3">
-                {lesson.description}
-              </p>
-            </div>
-            {isPremiumLesson && (
-              <div className="ml-2">
-                <span className="badge badge-warning gap-1">
-                  <FaCrown className="w-3 h-3" />
-                  Premium
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Categories and Emotion */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            <span className="badge badge-primary badge-sm">{lesson.category}</span>
-            <span className="badge badge-secondary badge-sm">{lesson.emotion}</span>
-          </div>
-
-          {/* Author Info */}
-          <div className="flex items-center gap-3 mb-4">
-            <img
-              src={lesson.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(lesson.authorName || 'User') + '&background=6366f1&color=fff'}
-              alt={lesson.authorName}
-              className="w-8 h-8 rounded-full"
-            />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-base-content">
-                {lesson.authorName}
-              </p>
-              <p className="text-xs text-base-content/60 flex items-center gap-1">
-                <FaCalendarAlt className="w-3 h-3" />
-                {new Date(lesson.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4 text-sm text-base-content/60">
-              <span className="flex items-center gap-1">
-                <FaEye className="w-4 h-4" />
-                {lesson.views || 0}
-              </span>
-              <span className="flex items-center gap-1">
-                <FaHeart className="w-4 h-4" />
-                {lesson.favorites || 0}
-              </span>
-            </div>
-          </div>
-
-          {/* Action Button */}
-          <Link
-            to={isBlurred ? '/pricing' : `/lesson/${lesson._id}`}
-            className={`btn w-full ${
-              isBlurred
-                ? 'btn-warning'
-                : 'btn-primary'
-            }`}
-          >
-            {isBlurred ? (
-              <>
-                <FaCrown className="w-4 h-4 mr-2" />
-                Upgrade to View
-              </>
-            ) : (
-              <>
-                <FaBookOpen className="w-4 h-4 mr-2" />
-                Read Lesson
-              </>
-            )}
-          </Link>
-        </div>
-      </motion.div>
-    );
-  };
+  const paginatedLessons = filteredLessons.slice(
+    startIndex,
+    startIndex + lessonsPerPage
+  );
 
   if (isLoading) {
     return (
@@ -239,7 +112,7 @@ const PublicLessons = () => {
 
   return (
     <div className="min-h-screen bg-base-200 py-8">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className=''>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -247,11 +120,12 @@ const PublicLessons = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-extrabold mb-4 bg-linear-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent">
             Public Life Lessons
           </h1>
           <p className="text-lg text-base-content/70 max-w-3xl mx-auto">
-            Discover wisdom and insights shared by our community. Learn from others' experiences and grow together.
+            Discover wisdom and insights shared by our community. Learn from
+            others' experiences and grow together.
           </p>
         </motion.div>
 
@@ -262,7 +136,7 @@ const PublicLessons = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="bg-base-100 p-6 rounded-2xl shadow-lg mb-8"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 pt-3 gap-4">
             {/* Search */}
             <div className="relative">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" />
@@ -317,7 +191,8 @@ const PublicLessons = () => {
 
           {/* Results Count */}
           <div className="mt-4 text-sm text-base-content/60">
-            Showing {paginatedLessons.length} of {filteredLessons.length} lessons
+            Showing {paginatedLessons.length} of {filteredLessons.length}{' '}
+            lessons
           </div>
         </motion.div>
 
@@ -360,21 +235,25 @@ const PublicLessons = () => {
               >
                 «
               </button>
-              
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`join-item btn ${
-                    currentPage === page ? 'btn-active' : ''
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-              
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`join-item btn ${
+                      currentPage === page ? 'btn-active' : ''
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
               <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages, currentPage + 1))
+                }
                 disabled={currentPage === totalPages}
                 className="join-item btn"
               >
