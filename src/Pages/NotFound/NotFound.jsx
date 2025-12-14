@@ -158,13 +158,13 @@ const NotFound = () => {
               Dashboard
             </Link>
             <Link
-              to="/dashboard/add_lesson"
+              to="/dashboard/add-lesson"
               className="link link-primary hover:link-secondary transition-colors"
             >
               Add Lesson
             </Link>
             <Link
-              to="/dashboard/my_lessons"
+              to="/dashboard/my-lessons"
               className="link link-primary hover:link-secondary transition-colors"
             >
               My Lessons

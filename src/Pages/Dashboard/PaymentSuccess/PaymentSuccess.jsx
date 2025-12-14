@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router';
 
-
-
 import {
   FaCheckCircle,
   FaCrown,
@@ -23,22 +21,19 @@ const PaymentSuccess = () => {
   // const { user } = useAuth();
   const axios = useAxios();
 
-
-  const [searchParams] = useSearchParams()
+  const [searchParams] = useSearchParams();
 
   const sessionId = searchParams.get('session_id');
 
-  console.log(sessionId)
+  console.log(sessionId);
 
   useEffect(() => {
-    if(sessionId){
-      axios.patch(`/payment_success?session_id=${sessionId}`)
-      .then(res => {
-        console.log(res.data)
-      })
+    if (sessionId) {
+      axios.patch(`/payment_success?session_id=${sessionId}`).then((res) => {
+        console.log(res.data);
+      });
     }
-  }, [sessionId, axios])
-  
+  }, [sessionId, axios]);
 
   const premiumFeatures = [
     {
@@ -74,7 +69,7 @@ const PaymentSuccess = () => {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-[60vh] flex items-center justify-center px-4">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden opacity-30">
         <motion.div
@@ -136,86 +131,11 @@ const PaymentSuccess = () => {
             <p className="text-base-content/60">
               You now have lifetime access to all premium features and content.
             </p>
+
             
-            {/* Premium Status Display */}
-            {/* <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="mt-6 p-4 rounded-2xl border"
-            >
-              {currentUser?.isPremium ? (
-                <div className="bg-linear-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/30 p-4 rounded-2xl">
-                  <div className="flex items-center justify-center gap-2 text-yellow-600 font-bold">
-                    <FaCrown className="w-5 h-5" />
-                    Premium Status: ACTIVE ✅
-                    <FaCrown className="w-5 h-5" />
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-linear-to-r from-orange-500/20 to-red-500/20 border-orange-500/30 p-4 rounded-2xl">
-                  <div className="flex items-center justify-center gap-2 text-orange-600 font-bold mb-3">
-                    <FaExclamationTriangle className="w-5 h-5" />
-                    Premium Status: UPDATING...
-                  </div>
-                  <p className="text-sm text-base-content/70 mb-3">
-                    Your payment was successful, but your premium status is still updating. This usually takes a few seconds.
-                  </p>
-                  <button
-                    onClick={handleManualRefresh}
-                    disabled={isRefreshing}
-                    className="btn btn-sm btn-primary gap-2"
-                  >
-                    {isRefreshing ? (
-                      <>
-                        <span className="loading loading-spinner loading-xs"></span>
-                        Refreshing...
-                      </>
-                    ) : (
-                      <>
-                        <FaSync className="w-3 h-3" />
-                        Refresh Status
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </motion.div> */}
           </div>
         </motion.div>
 
-        {/* Premium Features Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="mb-12"
-        >
-          <h3 className="text-2xl font-bold text-base-content mb-8">
-            Your Premium Benefits
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {premiumFeatures.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.8 + index * 0.1 }}
-                className="bg-base-100/80 backdrop-blur-lg p-6 rounded-2xl shadow-lg border border-base-300/50 hover:shadow-xl transition-all duration-300"
-              >
-                <div className="text-primary mb-4 flex justify-center">
-                  {feature.icon}
-                </div>
-                <h4 className="text-lg font-bold text-base-content mb-2">
-                  {feature.title}
-                </h4>
-                <p className="text-base-content/60 text-sm">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
 
         {/* Action Buttons */}
         <motion.div
@@ -231,7 +151,7 @@ const PaymentSuccess = () => {
             <FaTachometerAlt className="w-5 h-5" />
             Go to Dashboard
           </Link>
-          
+
           <Link
             to="/dashboard/add_lesson"
             className="btn btn-secondary btn-lg gap-3 hover:scale-105 transition-transform duration-200"
@@ -239,7 +159,7 @@ const PaymentSuccess = () => {
             <FaBookOpen className="w-5 h-5" />
             Create Premium Lesson
           </Link>
-          
+
           <Link
             to="/"
             className="btn btn-outline btn-lg gap-3 hover:scale-105 transition-transform duration-200"
@@ -275,26 +195,13 @@ const PaymentSuccess = () => {
           </div>
           <div className="mt-4 pt-4 border-t border-base-content/10">
             <p className="text-xs text-base-content/60">
-              Transaction completed on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
+              Transaction completed on {new Date().toLocaleDateString()} at{' '}
+              {new Date().toLocaleTimeString()}
             </p>
           </div>
         </motion.div>
 
-        {/* Thank You Message */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.4 }}
-          className="mt-8 p-6 bg-linear-to-r from-purple-500/10 via-blue-500/10 to-pink-500/10 rounded-2xl border border-purple-500/20"
-        >
-          <h4 className="text-xl font-bold text-base-content mb-2">
-            Thank You for Choosing Premium! 🙏
-          </h4>
-          <p className="text-base-content/70">
-            Your support helps us continue building the best platform for sharing life lessons and wisdom. 
-            We're excited to see the amazing content you'll create!
-          </p>
-        </motion.div>
+        
       </motion.div>
     </div>
   );

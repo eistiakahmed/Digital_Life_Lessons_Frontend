@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router';
 import useAuth from '../../../hooks/useAuth';
 import useAxios from '../../../hooks/useAxios';
 import {
@@ -16,19 +17,22 @@ import {
   FaCalendarAlt,
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
-import { invalidateUserQueries } from '../../../utils/cacheUtils';
 
 
 const Profile = () => {
   const { user, updateUserProfile } = useAuth();
   const axios = useAxios();
   const queryClient = useQueryClient();
+  
+  
+  const [isUpdating, setIsUpdating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
     displayName: user?.displayName || '',
     photoURL: user?.photoURL || '',
   });
 
+  
   const { data: currentUser, isLoading: userLoading } = useQuery({
     queryKey: ['currentUser', user?.email],
     queryFn: async () => {
@@ -36,7 +40,8 @@ const Profile = () => {
       const res = await axios.get(`/user/${user.email}`);
       return res.data;
     },
-    enabled: !!user?.email,
+    enabled: !!user?.email, 
+    
   });
 
   const { data: userLessons = [], isLoading: lessonsLoading } = useQuery({
@@ -47,34 +52,49 @@ const Profile = () => {
       return res.data;
     },
     enabled: !!user?.email,
+    
   });
 
-  const updateProfileMutation = useMutation({
-    mutationFn: async (updatedData) => {
-      await updateUserProfile(updatedData.displayName, updatedData.photoURL);
-      return axios.put(`/user/${user.email}`, {
-        displayName: updatedData.displayName,
-        photoURL: updatedData.photoURL,
-      });
-    },
-    onSuccess: () => {
-      toast.success('Profile updated successfully!');
-      setIsEditing(false);
-      
-      invalidateUserQueries(queryClient);
-    },
-    onError: (error) => {
-      toast.error('Failed to update profile');
-      console.error(error);
-    },
-  });
+  
+  useEffect(() => {
+    setEditForm({
+      displayName: user?.displayName || '',
+      photoURL: user?.photoURL || '',
+    });
+  }, [user?.displayName, user?.photoURL]);
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
     if (!editForm.displayName.trim()) {
       toast.error('Display name cannot be empty');
       return;
     }
-    updateProfileMutation.mutate(editForm);
+
+    try {
+      setIsUpdating(true);
+      
+      // Update Firebase Auth profile
+      await updateUserProfile(editForm.displayName, editForm.photoURL);
+      
+      // Update database
+      await axios.put(`/user/${user.email}`, {
+        displayName: editForm.displayName,
+        photoURL: editForm.photoURL,
+      });
+
+      toast.success('Profile updated successfully!');
+      setIsEditing(false);
+      
+      
+      queryClient.invalidateQueries(['currentUser', user?.email]);
+      queryClient.invalidateQueries(['userLessons', user?.email]); 
+      queryClient.invalidateQueries(['topContributors']); 
+      
+    } catch (error) {
+      toast.error('Failed to update profile');
+      console.error(error);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -166,11 +186,11 @@ const Profile = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={handleSaveProfile}
-                      disabled={updateProfileMutation.isPending}
+                      disabled={isUpdating}
                       className="btn btn-success btn-sm"
                     >
                       <FaSave className="w-4 h-4" />
-                      {updateProfileMutation.isPending ? 'Saving...' : 'Save'}
+                      {isUpdating ? 'Saving...' : 'Save'}
                     </button>
                     <button
                       onClick={handleCancelEdit}
@@ -222,9 +242,7 @@ const Profile = () => {
               className="bg-base-100 p-6 rounded-2xl shadow-lg border border-base-300"
             >
               <div className="flex items-center gap-4">
-                <div
-                  className={`p-3 rounded-full border border-gray-100 shadow-md`}
-                >
+                <div className="p-3 rounded-full border border-gray-100 shadow-md">
                   {stat.icon}
                 </div>
                 <div>

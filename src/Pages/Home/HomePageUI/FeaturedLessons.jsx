@@ -17,10 +17,10 @@ const FeaturedLessons = () => {
 
   // Fetch featured lessons
   const { data: featuredLessons = [], isLoading } = useQuery({
-    queryKey: ['featuredLessons'],
+    queryKey: ['lessons', 'featured'],
     queryFn: async () => {
       const res = await axios.get('/lessons/featured');
-      return res.data.slice(0, 6); // Show only 6 featured lessons
+      return res.data;
     },
   });
 
@@ -34,12 +34,14 @@ const FeaturedLessons = () => {
     );
   }
 
+
+
   if (featuredLessons.length === 0) {
-    return null; // Don't show section if no featured lessons
+    return null; 
   }
 
   return (
-    <section className="py-16 bg-base-100">
+    <section className="py-16">
       <div className="px-4">
         {/* Section Header */}
         <motion.div
@@ -50,15 +52,15 @@ const FeaturedLessons = () => {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <FaStar className="w-8 h-8 text-yellow-500" />
-            <h2 className="text-4xl font-bold text-base-content">
+            
+            <h2 className="text-5xl font-bold text-primary">
               Featured Life Lessons
             </h2>
-            <FaStar className="w-8 h-8 text-yellow-500" />
+            
           </div>
           <p className="text-lg text-base-content/70 max-w-3xl mx-auto">
-            Discover handpicked wisdom and insights from our community. These lessons have been 
-            carefully selected for their impact and value.
+            Discover handpicked wisdom and insights from our community. These
+            lessons have been carefully selected for their impact and value.
           </p>
         </motion.div>
 
@@ -82,7 +84,7 @@ const FeaturedLessons = () => {
                     Featured
                   </span>
                 </div>
-                
+
                 {/* Premium Badge */}
                 {lesson.accessLevel === 'Premium' && (
                   <div className="absolute top-4 right-4 z-10">
@@ -103,7 +105,7 @@ const FeaturedLessons = () => {
                     />
                   </div>
                 ) : (
-                  <div className="h-48 bg-gradient-to-br from-purple-500/20 via-blue-500/20 to-pink-500/20 flex items-center justify-center">
+                  <div className="h-48 bg-linear-to-br from-purple-500/20 via-blue-500/20 to-pink-500/20 flex items-center justify-center">
                     <FaBookOpen className="w-16 h-16 text-base-content/30" />
                   </div>
                 )}
@@ -121,7 +123,7 @@ const FeaturedLessons = () => {
                 </div>
 
                 {/* Title and Description */}
-                <h3 className="text-xl font-bold text-base-content mb-3 line-clamp-2">
+                <h3 className="text-xl font-bold text-base-content mb-3 h-14 line-clamp-2">
                   {lesson.title}
                 </h3>
                 <p className="text-base-content/70 text-sm line-clamp-3 mb-4">
@@ -132,13 +134,18 @@ const FeaturedLessons = () => {
                 <div className="flex items-center gap-3 mb-4">
                   <Link to={`/profile/${lesson.authorEmail}`}>
                     <img
-                      src={lesson.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(lesson.authorName || 'User') + '&background=6366f1&color=fff'}
+                      src={
+                        lesson.authorImage ||
+                        'https://ui-avatars.com/api/?name=' +
+                          encodeURIComponent(lesson.authorName || 'User') +
+                          '&background=6366f1&color=fff'
+                      }
                       alt={lesson.authorName}
                       className="w-8 h-8 rounded-full hover:ring-2 hover:ring-primary transition-all cursor-pointer"
                     />
                   </Link>
                   <div className="flex-1">
-                    <Link 
+                    <Link
                       to={`/profile/${lesson.authorEmail}`}
                       className="text-sm font-medium text-base-content hover:text-primary transition-colors"
                     >
@@ -151,19 +158,7 @@ const FeaturedLessons = () => {
                   </div>
                 </div>
 
-                {/* Stats */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-4 text-sm text-base-content/60">
-                    <span className="flex items-center gap-1">
-                      <FaEye className="w-4 h-4" />
-                      {Math.floor(Math.random() * 5000) + 500}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FaHeart className="w-4 h-4" />
-                      {Math.floor(Math.random() * 200) + 50}
-                    </span>
-                  </div>
-                </div>
+                
 
                 {/* Read Button */}
                 <Link

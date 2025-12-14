@@ -1,10 +1,8 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import useAuth from '../../../hooks/useAuth';
 import useAxios from '../../../hooks/useAxios';
 import toast from 'react-hot-toast';
-import { invalidateUserQueries } from '../../../utils/cacheUtils';
 import {
   FaUser,
   FaEdit,
@@ -25,18 +23,18 @@ import {
 const AdminProfile = () => {
   const { user, updateUserProfile } = useAuth();
   const axios = useAxios();
-  const queryClient = useQueryClient();
   
   const [isEditing, setIsEditing] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [adminStats, setAdminStats] = useState({});
   const [formData, setFormData] = useState({
     name: user?.displayName || '',
     image: user?.photoURL || '',
   });
 
   // Fetch admin stats
-  const { data: adminStats = {} } = useQuery({
-    queryKey: ['adminStats'],
-    queryFn: async () => {
+  const fetchAdminStats = async () => {
+    try {
       const [usersRes, lessonsRes, reportsRes] = await Promise.all([
         axios.get('/users'),
         axios.get('/admin/lessons'),
@@ -47,7 +45,7 @@ const AdminProfile = () => {
       const lessons = lessonsRes.data;
       const reports = reportsRes.data;
       
-      return {
+      setAdminStats({
         totalUsers: users.length,
         premiumUsers: users.filter(u => u.isPremium).length,
         adminUsers: users.filter(u => u.role === 'admin').length,
@@ -56,33 +54,50 @@ const AdminProfile = () => {
         featuredLessons: lessons.filter(l => l.isFeatured).length,
         totalReports: reports.length,
         pendingReports: reports.filter(r => !r.resolved).length,
-      };
-    },
-  });
+      });
+    } catch (error) {
+      console.error('Failed to fetch admin stats:', error);
+      setAdminStats({});
+    }
+  };
 
-  // Update profile mutation
-  const updateProfileMutation = useMutation({
-    mutationFn: async (updateData) => {
+  // Load admin stats when component mounts
+  useEffect(() => {
+    fetchAdminStats();
+  }, []);
+
+  // Update form data when user changes
+  useEffect(() => {
+    setFormData({
+      name: user?.displayName || '',
+      image: user?.photoURL || '',
+    });
+  }, [user?.displayName, user?.photoURL]);
+
+  // Update profile function
+  const updateProfile = async (updateData) => {
+    try {
+      setIsUpdating(true);
+      
       // Update in Firebase Auth
       await updateUserProfile(updateData.name, updateData.image);
       
       // Update in MongoDB
-      return axios.put(`/user/${user.email}`, {
+      await axios.put(`/user/${user.email}`, {
         name: updateData.name,
         image: updateData.image,
       });
-    },
-    onSuccess: () => {
-      // Invalidate all user-related queries to ensure UI updates everywhere
-      invalidateUserQueries(queryClient);
+
       toast.success('Profile updated successfully!');
       setIsEditing(false);
-    },
-    onError: (error) => {
+      
+    } catch (error) {
       toast.error('Failed to update profile');
       console.error(error);
-    },
-  });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -98,7 +113,7 @@ const AdminProfile = () => {
       return;
     }
     
-    updateProfileMutation.mutate(formData);
+    updateProfile(formData);
   };
 
   const handleCancel = () => {
@@ -253,7 +268,7 @@ const AdminProfile = () => {
                     <>
                       <button
                         onClick={handleSave}
-                        disabled={updateProfileMutation.isPending}
+                        disabled={isUpdating}
                         className="btn btn-success btn-sm gap-2"
                       >
                         <FaSave className="w-3 h-3" />

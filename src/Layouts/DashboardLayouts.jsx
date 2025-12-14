@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink, Outlet } from 'react-router';
 import Logo from '../Shared/Logo/Logo';
 import ThemeToggle from '../Components/ThemeToggle';
@@ -14,240 +13,213 @@ import {
   FaBookOpen,
   FaFlag,
   FaShieldAlt,
-  
+  FaBars,
 } from 'react-icons/fa';
+
+
+const NavItem = ({ to, icon, label, end, activeColor, onClick }) => (
+  <li>
+    <NavLink
+      to={to}
+      end={end}
+      onClick={onClick}
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${
+          isActive
+            ? activeColor || 'bg-primary text-primary-content shadow-md'
+            : 'hover:bg-base-300 text-base-content'
+        }`
+      }
+    >
+      {icon}
+      {label}
+    </NavLink>
+  </li>
+);
 
 const DashboardLayouts = () => {
   const { LogoutUser, userDB } = useAuth();
-  
-  // Check if user is admin
-  const isAdmin = userDB?.role === 'admin';
 
-  const handleLogout = () => {
-    LogoutUser()
-      .then(() => {
-        toast.success('Logged out successfully');
-      })
-      .catch((error) => {
-        toast.error(error.message);
-      });
+  // Safe role handling
+  const role = userDB?.role;
+  const isAdmin = role === 'admin';
+  
+
+  const handleLogout = async () => {
+    try {
+      await LogoutUser();
+      toast.success('Logged out successfully');
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
+
+  
+  const SidebarContent = ({ onNavClick }) => (
+    <>
+      <div className="text-2xl font-bold mb-8 flex justify-center text-primary">
+        <Logo />
+      </div>
+
+      <ul className="space-y-3 flex-1">
+        
+        {isAdmin ? (
+          <>
+            <NavItem
+              to="/dashboard/admin"
+              icon={<FaShieldAlt />}
+              label="Admin Dashboard"
+              onClick={onNavClick}
+            />
+            <NavItem
+              to="/dashboard/admin/manage_users"
+              icon={<FaUsers />}
+              label="Manage Users"
+              onClick={onNavClick}
+            />
+            <NavItem
+              to="/dashboard/admin/manage_lessons"
+              icon={<FaBookOpen />}
+              label="Manage Lessons"
+              onClick={onNavClick}
+            />
+            <NavItem
+              to="/dashboard/admin/reported_lessons"
+              icon={<FaFlag />}
+              label="Reported Content"
+              activeColor="bg-warning text-warning-content"
+              onClick={onNavClick}
+            />
+            <NavItem
+              to="/dashboard/admin/profile"
+              icon={<FaUser />}
+              label="Admin Profile"
+              onClick={onNavClick}
+            />
+          </>
+        ) : (
+          
+          <>
+            <NavItem
+              to="/dashboard"
+              end
+              icon={<LuLayoutDashboard />}
+              label="Dashboard"
+              onClick={onNavClick}
+            />
+            <NavItem
+              to="/dashboard/my_lessons"
+              icon={<LuBookMarked />}
+              label="My Lessons"
+              onClick={onNavClick}
+            />
+            <NavItem
+              to="/dashboard/add_lesson"
+              icon={<AiOutlinePlus />}
+              label="Add Lesson"
+              onClick={onNavClick}
+            />
+            <NavItem
+              to="/dashboard/favorites"
+              icon={<FaHeart />}
+              label="Favorites"
+              onClick={onNavClick}
+            />
+            <NavItem
+              to="/dashboard/profile"
+              icon={<FaUser />}
+              label="Profile"
+              onClick={onNavClick}
+            />
+          </>
+        )}
+      </ul>
+
+      <div className="pt-6 border-t text-sm text-center text-base-content">
+        DigitalLifeLessons © 2025
+      </div>
+    </>
+  );
 
   return (
     <div className="min-h-screen bg-base-200 transition-colors duration-300">
-      <div className="flex w-11/12 mx-auto gap-6 py-6">
-        <aside className="w-64 h-[95vh] bg-base-100 rounded-xl shadow-lg p-6 hidden md:flex flex-col">
-          <div className="text-2xl font-bold mb-8 flex items-center justify-center text-primary">
-            <Logo />
-          </div>
-
-          <ul className="space-y-3 flex-1">
-            {/* Admin Navigation */}
-            {isAdmin ? (
-              <>
-                {/* Admin Dashboard */}
-                <li>
-                  <NavLink
-                    to="/dashboard/admin"
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                        isActive
-                          ? 'bg-error text-error-content shadow-md'
-                          : 'hover:bg-base-300 text-base-content'
-                      }`
-                    }
-                  >
-                    <FaShieldAlt size={20} />
-                    Admin Dashboard
-                  </NavLink>
-                </li>
-
-                {/* Manage Users */}
-                <li>
-                  <NavLink
-                    to="/dashboard/admin/manage-users"
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                        isActive
-                          ? 'bg-primary text-primary-content shadow-md'
-                          : 'hover:bg-base-300 text-base-content'
-                      }`
-                    }
-                  >
-                    <FaUsers size={20} />
-                    Manage Users
-                  </NavLink>
-                </li>
-
-                {/* Manage Lessons */}
-                <li>
-                  <NavLink
-                    to="/dashboard/admin/manage-lessons"
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                        isActive
-                          ? 'bg-primary text-primary-content shadow-md'
-                          : 'hover:bg-base-300 text-base-content'
-                      }`
-                    }
-                  >
-                    <FaBookOpen size={20} />
-                    Manage Lessons
-                  </NavLink>
-                </li>
-
-                {/* Reported Lessons */}
-                <li>
-                  <NavLink
-                    to="/dashboard/admin/reported-lessons"
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                        isActive
-                          ? 'bg-warning text-warning-content shadow-md'
-                          : 'hover:bg-base-300 text-base-content'
-                      }`
-                    }
-                  >
-                    <FaFlag size={20} />
-                    Reported Content
-                  </NavLink>
-                </li>
-
-                {/* Admin Profile */}
-                <li>
-                  <NavLink
-                    to="/dashboard/admin/profile"
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                        isActive
-                          ? 'bg-primary text-primary-content shadow-md'
-                          : 'hover:bg-base-300 text-base-content'
-                      }`
-                    }
-                  >
-                    <FaUser size={20} />
-                    Admin Profile
-                  </NavLink>
-                </li>
-
-                {/* Divider */}
-                <li className="pt-4">
-                  <div className="border-t border-base-300 mb-4"></div>
-                  <p className="text-xs text-base-content/50 px-4 mb-2">
-                    User Features
-                  </p>
-                </li>
-              </>
-            ) : null}
-
-            {/* Regular User Navigation */}
-            <li>
-              <NavLink
-                to="/dashboard"
-                end
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-primary text-primary-content shadow-md'
-                      : 'hover:bg-base-300 text-base-content'
-                  }`
-                }
-              >
-                <LuLayoutDashboard size={20} />
-                Dashboard
-              </NavLink>
-            </li>
-
-            <li>
-              <NavLink
-                to="/dashboard/my_lessons"
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-primary text-primary-content shadow-md'
-                      : 'hover:bg-base-300 text-base-content'
-                  }`
-                }
-              >
-                <LuBookMarked size={20} />
-                My Lessons
-              </NavLink>
-            </li>
-
-            <li>
-              <NavLink
-                to="/dashboard/add_lesson"
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-primary text-primary-content shadow-md'
-                      : 'hover:bg-base-300 text-base-content'
-                  }`
-                }
-              >
-                <AiOutlinePlus size={20} />
-                Add Lesson
-              </NavLink>
-            </li>
-
-            <li>
-              <NavLink
-                to="/dashboard/favorites"
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-primary text-primary-content shadow-md'
-                      : 'hover:bg-base-300 text-base-content'
-                  }`
-                }
-              >
-                <FaHeart size={20} />
-                Favorites
-              </NavLink>
-            </li>
-
-            <li>
-              <NavLink
-                to={isAdmin ? '/dashboard/admin/profile' : '/dashboard/profile'}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-primary text-primary-content shadow-md'
-                      : 'hover:bg-base-300 text-base-content'
-                  }`
-                }
-              >
-                <FaUser size={20} />
-                Profile
-              </NavLink>
-            </li>
-          </ul>
-
-          <div className="pt-6 border-t border-base-300 text-sm text-center text-base-content">
-            DigitalLifeLessons &copy; 2025
-          </div>
-        </aside>
-
-        <main className="flex-1 flex flex-col gap-6">
-          {/* Top Navbar */}
-          <div className="flex justify-between items-center p-4 bg-base-100 rounded-xl shadow-md">
-            <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
-            <div className="flex items-center gap-3">
+      
+      <div className="drawer lg:drawer-open">
+        <input id="dashboard-drawer" type="checkbox" className="drawer-toggle" />
+        
+        <div className="drawer-content flex flex-col">
+          
+          <div className="navbar bg-base-100 lg:hidden shadow-md">
+            <div className="flex-none">
+              <label htmlFor="dashboard-drawer" className="btn btn-square btn-ghost">
+                <FaBars className="w-5 h-5" />
+              </label>
+            </div>
+            <div className="flex-1">
+              <h1 className="text-xl font-bold text-primary">Dashboard</h1>
+            </div>
+            <div className="flex-none flex items-center gap-2">
               <ThemeToggle />
               <button
                 onClick={handleLogout}
-                className="btn btn-primary btn-sm font-bold hover:scale-105 rounded-full transition-transform duration-200 gap-2"
+                className="btn btn-primary btn-sm rounded-full gap-2"
               >
-                <FaSignOutAlt size={16} />
-                Logout
+                <FaSignOutAlt />
+                <span className="hidden sm:inline">Logout</span>
               </button>
             </div>
           </div>
 
-          <div className="flex-1 bg-base-100 rounded-xl shadow-inner p-6 transition-colors duration-300">
-            <Outlet />
+          
+          <div className="hidden lg:flex w-11/12 mx-auto gap-6 py-6">
+            {/* Desktop Sidebar */}
+            <aside className="w-64 min-h-[95vh] bg-base-100 rounded-xl shadow-lg p-6 flex flex-col z-20">
+              <SidebarContent />
+            </aside>
+
+            {/* Desktop Main Content */}
+            <main className="flex-1 flex flex-col gap-6 z-10">
+              <div className="flex justify-between items-center p-4 bg-base-100 rounded-xl shadow-md">
+                <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
+
+                <div className="flex items-center gap-3">
+                  <ThemeToggle />
+                  <button
+                    onClick={handleLogout}
+                    className="btn btn-primary btn-sm rounded-full gap-2"
+                  >
+                    <FaSignOutAlt />
+                    Logout
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex-1 bg-base-100 rounded-xl shadow-inner p-6">
+                <Outlet />
+              </div>
+            </main>
           </div>
-        </main>
+
+          {/* Mobile Main Content */}
+          <div className="lg:hidden flex-1 p-4">
+            <div className="bg-base-100 rounded-xl shadow-inner p-6 min-h-[calc(100vh-120px)]">
+              <Outlet />
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Drawer Sidebar */}
+        <div className="drawer-side lg:hidden">
+          <label htmlFor="dashboard-drawer" className="drawer-overlay"></label>
+          <aside className="w-64 min-h-full bg-base-100 p-6 flex flex-col">
+            <SidebarContent 
+              onNavClick={() => {
+                
+                document.getElementById('dashboard-drawer').checked = false;
+              }}
+            />
+          </aside>
+        </div>
       </div>
     </div>
   );

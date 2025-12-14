@@ -1,100 +1,108 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import useAuth from '../../../hooks/useAuth';
 import useAxios from '../../../hooks/useAxios';
 import toast from 'react-hot-toast';
-import { invalidateLessonQueries } from '../../../utils/cacheUtils';
-import { Link } from 'react-router'; 
+import { Link } from 'react-router';
 import { AiFillEye, AiOutlineEdit, AiFillDelete } from 'react-icons/ai';
+import { FaBookOpen, FaHeart } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 
 const MyLessons = () => {
   const { user } = useAuth();
   const axios = useAxios();
   const queryClient = useQueryClient();
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  // Fetch user's lessons
+  // Fetch my lessons
   const { data: lessons = [], isLoading } = useQuery({
     queryKey: ['myLessons', user?.email],
+    enabled: !!user?.email,
     queryFn: async () => {
-      if (!user?.email) return [];
       const res = await axios.get(`/lessons/user/${user.email}`);
       return res.data;
     },
   });
 
-  // Fetch current user details to check premium status
-  const { data: currentUser } = useQuery({
+  // Fetch current user
+  const { data: currentUser = {} } = useQuery({
     queryKey: ['currentUser', user?.email],
+    enabled: !!user?.email,
     queryFn: async () => {
-      if (!user?.email) return {};
       const res = await axios.get(`/user/${user.email}`);
       return res.data || {};
     },
   });
 
-  // Toggle privacy mutation
-  const togglePrivacyMutation = useMutation({
-    mutationFn: (lesson) =>
-      axios.patch(`/lessons/privacy/${lesson._id}`, {
+  const handleTogglePrivacy = async (lesson) => {
+    try {
+      setIsUpdating(true);
+      await axios.patch(`/lessons/privacy/${lesson._id}`, {
         privacy: lesson.privacy === 'Public' ? 'Private' : 'Public',
-      }),
-    onSuccess: () => {
+      });
+      toast.success('Privacy updated');
       queryClient.invalidateQueries(['myLessons', user?.email]);
-      toast.success('Privacy updated!');
-    },
-  });
+      queryClient.invalidateQueries(['publicLessons']);
+    } catch {
+      toast.error('Failed to update privacy');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
-  // Toggle access level mutation (Premium users only)
-  const toggleAccessMutation = useMutation({
-    mutationFn: (lesson) =>
-      axios.patch(`/lessons/access/${lesson._id}`, {
+  const handleToggleAccess = async (lesson) => {
+    try {
+      setIsUpdating(true);
+      await axios.patch(`/lessons/access/${lesson._id}`, {
         accessLevel: lesson.accessLevel === 'Free' ? 'Premium' : 'Free',
-      }),
-    onSuccess: () => {
+      });
+      toast.success('Access updated');
       queryClient.invalidateQueries(['myLessons', user?.email]);
-      toast.success('Access level updated!');
-    },
-  });
+      queryClient.invalidateQueries(['publicLessons']);
+    } catch {
+      toast.error('Failed to update access');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
-  // Delete lesson mutation
-  const deleteLessonMutation = useMutation({
-    mutationFn: (id) => axios.delete(`/lessons/${id}`),
-    onSuccess: () => {
-      // Invalidate lesson-related queries to update UI everywhere
-      invalidateLessonQueries(queryClient);
-      toast.success('Lesson deleted successfully!');
-    },
-  });
+  const handleDeleteLesson = async (id) => {
+    try {
+      await axios.delete(`/lessons/${id}`);
+      toast.success('Lesson deleted');
+      queryClient.invalidateQueries(['myLessons', user?.email]);
+      queryClient.invalidateQueries(['publicLessons']);
+    } catch {
+      toast.error('Delete failed');
+    }
+  };
 
-  const handleDeleteLessons = (id) => {
+  const confirmDelete = (id) => {
     Swal.fire({
       title: 'Are you sure?',
-      text: 'You want to delete this lesson permanently?',
+      text: 'This lesson will be deleted permanently',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: 'Yes',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deleteLessonMutation.mutate(id);
-      }
+    }).then((res) => {
+      if (res.isConfirmed) handleDeleteLesson(id);
     });
   };
 
-  if (isLoading)
+  if (isLoading) {
     return <p className="text-center text-xl pt-10">Loading lessons...</p>;
+  }
 
   return (
     <div>
       <h2 className="text-3xl font-bold mb-6">My Lessons ({lessons.length})</h2>
 
-      <div className="overflow-x-auto rounded-xl shadow border border-base-300">
-        <table className="table text-center">
-          <thead className="bg-base-200 font-semibold">
+      {/* Desktop Table */}
+      <div className="hidden lg:block overflow-x-auto rounded-xl border">
+        <table className="table">
+          <thead className="bg-base-200">
             <tr>
-              <th>Serial No</th>
-              <th>Title</th>
+              <th>Lesson</th>
               <th>Category</th>
               <th>Privacy</th>
               <th>Access</th>
@@ -105,86 +113,119 @@ const MyLessons = () => {
           </thead>
 
           <tbody>
-            {lessons.map((lesson, index) => (
-              <tr key={lesson._id} className="hover">
-                <td>{index + 1}</td>
-                <td className="font-medium">{lesson.title}</td>
+            {lessons.map((lesson) => (
+              <tr key={lesson._id}>
+                <td className="flex gap-3">
+                  <span>{lesson.title}</span>
+                </td>
+
                 <td>{lesson.category}</td>
 
-                {/* Privacy */}
                 <td>
                   <button
-                    onClick={() => togglePrivacyMutation.mutate(lesson)}
-                    className={`badge cursor-pointer ${
-                      lesson.privacy === 'Public'
-                        ? 'badge-success'
-                        : 'badge-warning'
-                    }`}
+                    disabled={isUpdating}
+                    onClick={() => handleTogglePrivacy(lesson)}
+                    className="btn btn-xs"
                   >
                     {lesson.privacy}
                   </button>
                 </td>
 
-                {/* Access Level */}
                 <td>
                   {currentUser?.isPremium ? (
                     <button
-                      onClick={() => toggleAccessMutation.mutate(lesson)}
-                      className={`badge cursor-pointer ${
-                        lesson.accessLevel === 'Free'
-                          ? 'badge-info'
-                          : 'badge-error'
-                      }`}
+                      disabled={isUpdating}
+                      onClick={() => handleToggleAccess(lesson)}
+                      className="btn btn-xs"
                     >
                       {lesson.accessLevel}
                     </button>
                   ) : (
-                    <span
-                      className="badge badge-neutral"
-                      title="Premium required"
-                    >
-                      {lesson.accessLevel === 'Premium'
-                        ? 'Premium (Locked)'
-                        : 'Free'}
-                    </span>
+                    <span>{lesson.accessLevel}</span>
                   )}
                 </td>
 
-                {/* Stats */}
-                <td>
-                  <div className="text-xs">
-                    ❤️ {lesson.views || 0} <br />⭐ {lesson.favorites || 0}
-                  </div>
+                <td className="flex gap-3 justify-center">
+                  <span>
+                    <AiFillEye /> {lesson.views || 0}
+                  </span>
+                  <span>
+                    <FaHeart /> {lesson.likesCount || 0}
+                  </span>
                 </td>
 
-                {/* Created date */}
                 <td>{new Date(lesson.createdAt).toLocaleDateString()}</td>
 
-                {/* Actions */}
-                <td className="flex justify-center gap-2">
-                  <Link
-                    to={`/lesson/${lesson._id}`}
-                    className="btn btn-xs btn-info"
-                  >
-                    <AiFillEye size={16} />
+                <td className="flex gap-2 justify-center">
+                  <Link to={`/lesson/${lesson._id}`}>
+                    <AiFillEye />
                   </Link>
-                  <Link
-                    to={`/dashboard/update_lesson/${lesson._id}`}
-                    className="btn btn-xs btn-warning"
-                  >
-                    <AiOutlineEdit size={16} />
+                  <Link to={`/dashboard/update-lesson/${lesson._id}`}>
+                    <AiOutlineEdit />
                   </Link>
-                  <button
-                    className="btn btn-xs btn-error"
-                    onClick={() => handleDeleteLessons(lesson._id)}
-                  >
-                    <AiFillDelete size={16} />
+                  <button onClick={() => confirmDelete(lesson._id)}>
+                    <AiFillDelete />
                   </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="lg:hidden space-y-4">
+        {lessons.map((lesson) => (
+          <div key={lesson._id} className="border p-4 rounded-xl">
+            <h3 className="font-semibold">{lesson.title}</h3>
+            <p className="text-sm text-gray-500">{lesson.category}</p>
+
+            <div className="flex gap-2 my-2">
+              <button
+                onClick={() => handleTogglePrivacy(lesson)}
+                className="btn btn-xs"
+              >
+                {lesson.privacy}
+              </button>
+
+              {currentUser?.isPremium && (
+                <button
+                  onClick={() => handleToggleAccess(lesson)}
+                  className="btn btn-xs"
+                >
+                  {lesson.accessLevel}
+                </button>
+              )}
+            </div>
+
+            <div className="flex gap-3 text-sm">
+              <span>
+                <AiFillEye /> {lesson.views || 0}
+              </span>
+              <span>
+                <FaHeart /> {lesson.likesCount || 0}
+              </span>
+            </div>
+
+            <div className="flex gap-2 mt-3">
+              <Link to={`/lesson/${lesson._id}`} className="btn btn-sm">
+                View
+              </Link>
+              <Link
+                to={`/dashboard/update-lesson/${lesson._id}`}
+                className="btn btn-sm"
+              >
+                Edit
+              </Link>
+              <button
+                onClick={() => confirmDelete(lesson._id)}
+                className="btn btn-sm btn-error"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

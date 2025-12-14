@@ -20,7 +20,7 @@ const ManageUsers = () => {
   const { user } = useAuth();
   const axios = useAxios();
   const queryClient = useQueryClient();
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('All');
   const [filterPremium, setFilterPremium] = useState('All');
@@ -40,12 +40,12 @@ const ManageUsers = () => {
     queryFn: async () => {
       const res = await axios.get('/admin/lessons');
       const lessons = res.data;
-      
+
       const counts = {};
-      lessons.forEach(lesson => {
+      lessons.forEach((lesson) => {
         counts[lesson.authorEmail] = (counts[lesson.authorEmail] || 0) + 1;
       });
-      
+
       return counts;
     },
   });
@@ -63,15 +63,21 @@ const ManageUsers = () => {
     },
     onError: (error) => {
       console.error('Role update error:', error);
-      
+
       if (error.response?.status === 404) {
-        toast.error('Role update endpoint not found. Please check your backend.');
+        toast.error(
+          'Role update endpoint not found. Please check your backend.'
+        );
       } else if (error.response?.status === 500) {
         toast.error('Server error while updating role. Please try again.');
       } else if (error.code === 'NETWORK_ERROR' || !error.response) {
-        toast.error('Cannot connect to server. Please check if backend is running.');
+        toast.error(
+          'Cannot connect to server. Please check if backend is running.'
+        );
       } else {
-        toast.error(error.response?.data?.message || 'Failed to update user role');
+        toast.error(
+          error.response?.data?.message || 'Failed to update user role'
+        );
       }
     },
   });
@@ -89,13 +95,17 @@ const ManageUsers = () => {
     },
     onError: (error) => {
       console.error('User delete error:', error);
-      
+
       if (error.response?.status === 404) {
-        toast.error('User delete endpoint not found. Please check your backend.');
+        toast.error(
+          'User delete endpoint not found. Please check your backend.'
+        );
       } else if (error.response?.status === 500) {
         toast.error('Server error while deleting user. Please try again.');
       } else if (error.code === 'NETWORK_ERROR' || !error.response) {
-        toast.error('Cannot connect to server. Please check if backend is running.');
+        toast.error(
+          'Cannot connect to server. Please check if backend is running.'
+        );
       } else {
         toast.error(error.response?.data?.message || 'Failed to delete user');
       }
@@ -103,21 +113,25 @@ const ManageUsers = () => {
   });
 
   // Filter users
-  const filteredUsers = allUsers.filter(userData => {
-    const matchesSearch = userData.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         userData.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = filterRole === 'All' || userData.role === filterRole.toLowerCase();
-    const matchesPremium = filterPremium === 'All' || 
-                          (filterPremium === 'Premium' && userData.isPremium) ||
-                          (filterPremium === 'Free' && !userData.isPremium);
-    
+  const filteredUsers = allUsers.filter((userData) => {
+    const matchesSearch =
+      userData.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      userData.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole =
+      filterRole === 'All' || userData.role === filterRole.toLowerCase();
+    const matchesPremium =
+      filterPremium === 'All' ||
+      (filterPremium === 'Premium' && userData.isPremium) ||
+      (filterPremium === 'Free' && !userData.isPremium);
+
     return matchesSearch && matchesRole && matchesPremium;
   });
 
   const handleRoleChange = (email, currentRole) => {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
-    const actionText = newRole === 'admin' ? 'promote to Admin' : 'demote to User';
-    
+    const actionText =
+      newRole === 'admin' ? 'promote to Admin' : 'demote to User';
+
     Swal.fire({
       title: 'Are you sure?',
       text: `Do you want to ${actionText}?`,
@@ -166,7 +180,7 @@ const ManageUsers = () => {
         transition={{ duration: 0.6 }}
         className="text-center"
       >
-        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold mb-4 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
           Manage Users
         </h1>
         <p className="text-base-content/70 text-lg">
@@ -183,11 +197,13 @@ const ManageUsers = () => {
       >
         <div className="bg-blue-500/10 p-6 rounded-2xl border border-base-300">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full text-white">
+            <div className="p-3 bg-linear-to-r from-blue-500 to-cyan-500 rounded-full text-white">
               <FaUsers className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-base-content">{allUsers.length}</p>
+              <p className="text-2xl font-bold text-base-content">
+                {allUsers.length}
+              </p>
               <p className="text-base-content/60">Total Users</p>
             </div>
           </div>
@@ -195,12 +211,12 @@ const ManageUsers = () => {
 
         <div className="bg-yellow-500/10 p-6 rounded-2xl border border-base-300">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full text-white">
+            <div className="p-3 bg-linear-to-r from-yellow-500 to-orange-500 rounded-full text-white">
               <FaCrown className="w-6 h-6" />
             </div>
             <div>
               <p className="text-2xl font-bold text-base-content">
-                {allUsers.filter(u => u.isPremium).length}
+                {allUsers.filter((u) => u.isPremium).length}
               </p>
               <p className="text-base-content/60">Premium Users</p>
             </div>
@@ -209,12 +225,12 @@ const ManageUsers = () => {
 
         <div className="bg-purple-500/10 p-6 rounded-2xl border border-base-300">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full text-white">
+            <div className="p-3 bg-linear-to-r from-purple-500 to-indigo-500 rounded-full text-white">
               <FaUserShield className="w-6 h-6" />
             </div>
             <div>
               <p className="text-2xl font-bold text-base-content">
-                {allUsers.filter(u => u.role === 'admin').length}
+                {allUsers.filter((u) => u.role === 'admin').length}
               </p>
               <p className="text-base-content/60">Admins</p>
             </div>
@@ -223,12 +239,15 @@ const ManageUsers = () => {
 
         <div className="bg-green-500/10 p-6 rounded-2xl border border-base-300">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full text-white">
+            <div className="p-3 bg-linear-to-r from-green-500 to-emerald-500 rounded-full text-white">
               <FaBookOpen className="w-6 h-6" />
             </div>
             <div>
               <p className="text-2xl font-bold text-base-content">
-                {Object.values(userLessonCounts).reduce((sum, count) => sum + count, 0)}
+                {Object.values(userLessonCounts).reduce(
+                  (sum, count) => sum + count,
+                  0
+                )}
               </p>
               <p className="text-base-content/60">Total Lessons</p>
             </div>
@@ -247,7 +266,7 @@ const ManageUsers = () => {
           <FaFilter className="w-5 h-5 text-primary" />
           <h2 className="text-xl font-bold">Filter Users</h2>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search */}
           <div className="relative">
@@ -321,7 +340,12 @@ const ManageUsers = () => {
                   <td>
                     <div className="flex items-center gap-3">
                       <img
-                        src={userData.image || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userData.name || 'User') + '&background=6366f1&color=fff'}
+                        src={
+                          userData.image ||
+                          'https://ui-avatars.com/api/?name=' +
+                            encodeURIComponent(userData.name || 'User') +
+                            '&background=6366f1&color=fff'
+                        }
                         alt={userData.name}
                         className="w-10 h-10 rounded-full"
                       />
@@ -344,7 +368,11 @@ const ManageUsers = () => {
                     </span>
                   </td>
                   <td>
-                    <span className={`badge ${userData.role === 'admin' ? 'badge-error' : 'badge-info'}`}>
+                    <span
+                      className={`badge ${
+                        userData.role === 'admin' ? 'badge-error' : 'badge-info'
+                      }`}
+                    >
                       {userData.role === 'admin' ? (
                         <>
                           <FaUserShield className="w-3 h-3 mr-1" />
@@ -356,7 +384,11 @@ const ManageUsers = () => {
                     </span>
                   </td>
                   <td>
-                    <span className={`badge ${userData.isPremium ? 'badge-warning' : 'badge-neutral'}`}>
+                    <span
+                      className={`badge ${
+                        userData.isPremium ? 'badge-warning' : 'badge-neutral'
+                      }`}
+                    >
                       {userData.isPremium ? 'Premium' : 'Free'}
                     </span>
                   </td>
@@ -377,16 +409,24 @@ const ManageUsers = () => {
                       {userData.email !== user?.email && (
                         <>
                           <button
-                            onClick={() => handleRoleChange(userData.email, userData.role)}
-                            disabled={updateRoleMutation.isPending}
-                            className={`btn btn-xs ${userData.role === 'admin' ? 'btn-warning' : 'btn-success'}`}
+                            onClick={() =>
+                              handleRoleChange(userData.email, userData.role)
+                            }
+                            disabled={updateRoleMutation.isLoading}
+                            className={`btn btn-xs ${
+                              userData.role === 'admin'
+                                ? 'btn-warning'
+                                : 'btn-success'
+                            }`}
                           >
                             <FaUserShield className="w-3 h-3" />
                             {userData.role === 'admin' ? 'Demote' : 'Promote'}
                           </button>
-                          
+
                           <button
-                            onClick={() => handleDeleteUser(userData.email, userData.name)}
+                            onClick={() =>
+                              handleDeleteUser(userData.email, userData.name)
+                            }
                             disabled={deleteUserMutation.isPending}
                             className="btn btn-xs btn-error"
                           >

@@ -4,10 +4,7 @@ import { Link } from 'react-router';
 import useAxios from '../../../hooks/useAxios';
 import {
   FaBookmark,
-  FaHeart,
-  FaEye,
   FaCalendarAlt,
-  FaUser,
   FaCrown,
   FaBookOpen,
   FaFire,
@@ -16,15 +13,14 @@ import {
 const MostSavedLessons = () => {
   const axios = useAxios();
 
-  // Fetch most saved lessons
   const { data: mostSavedLessons = [], isLoading } = useQuery({
     queryKey: ['mostSavedLessons'],
     queryFn: async () => {
       const res = await axios.get('/lessons/most-saved');
-      return res.data.slice(0, 6); // Show top 6 most saved lessons
+      return res.data;
     },
-    staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
-    cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
   });
 
   if (isLoading) {
@@ -38,11 +34,11 @@ const MostSavedLessons = () => {
   }
 
   if (mostSavedLessons.length === 0) {
-    return null; // Don't show section if no saved lessons
+    return null;
   }
 
   return (
-    <section className="py-16 bg-base-100">
+    <section className="py-16">
       <div className="px-4">
         {/* Section Header */}
         <motion.div
@@ -53,14 +49,12 @@ const MostSavedLessons = () => {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <FaFire className="w-8 h-8 text-orange-500" />
-            <h2 className="text-4xl font-bold text-base-content">
+            <h2 className="text-5xl font-bold text-primary">
               Most Saved Lessons
             </h2>
-            <FaFire className="w-8 h-8 text-orange-500" />
           </div>
           <p className="text-lg text-base-content/70 max-w-3xl mx-auto">
-            These life lessons have resonated with our community the most. 
+            These life lessons have resonated with our community the most.
             Discover the wisdom that others found worth saving and revisiting.
           </p>
         </motion.div>
@@ -85,24 +79,14 @@ const MostSavedLessons = () => {
                     Trending
                   </span>
                 </div>
-                
+
                 {/* Save Count Badge */}
                 <div className="absolute top-4 right-4 z-10">
                   <span className="badge badge-success gap-1 shadow-lg">
                     <FaBookmark className="w-3 h-3" />
-                    {lesson.savesCount || Math.floor(Math.random() * 500) + 100}
+                    {lesson.favoritesCount}
                   </span>
                 </div>
-
-                {/* Premium Badge */}
-                {lesson.accessLevel === 'Premium' && (
-                  <div className="absolute top-16 right-4 z-10">
-                    <span className="badge badge-warning gap-1 shadow-lg">
-                      <FaCrown className="w-3 h-3" />
-                      Premium
-                    </span>
-                  </div>
-                )}
 
                 {/* Lesson Image */}
                 {lesson.image ? (
@@ -114,7 +98,7 @@ const MostSavedLessons = () => {
                     />
                   </div>
                 ) : (
-                  <div className="h-48 bg-gradient-to-br from-orange-500/20 via-red-500/20 to-pink-500/20 flex items-center justify-center">
+                  <div className="h-48 bg-linear-to-br from-orange-500/20 via-red-500/20 to-pink-500/20 flex items-center justify-center">
                     <FaBookOpen className="w-16 h-16 text-base-content/30" />
                   </div>
                 )}
@@ -127,22 +111,37 @@ const MostSavedLessons = () => {
                     <span className="text-3xl font-bold text-orange-500">
                       #{index + 1}
                     </span>
-                    <span className="text-sm text-base-content/60">Most Saved</span>
+                    <span className="text-sm text-base-content/60">
+                      Most Saved
+                    </span>
                   </div>
                 </div>
 
                 {/* Categories */}
-                <div className="flex flex-wrap gap-2 mb-3">
-                  <span className="badge badge-primary badge-sm">
-                    {lesson.category}
-                  </span>
-                  <span className="badge badge-secondary badge-sm">
-                    {lesson.emotion}
-                  </span>
+                <div className="flex flex-wrap justify-between gap-2 mb-3">
+                  <div className="">
+                    <span className="badge badge-primary badge-sm">
+                      {lesson.category}
+                    </span>
+                    <span className="badge badge-secondary badge-sm ml-2">
+                      {lesson.emotion}
+                    </span>
+                  </div>
+                  {/* Premium Badge */}
+                  <div>
+                    {lesson.accessLevel === 'Premium' && (
+                      <div className="">
+                        <span className="badge badge-warning gap-1 shadow-lg">
+                          <FaCrown className="w-3 h-3" />
+                          Premium
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Title and Description */}
-                <h3 className="text-xl font-bold text-base-content mb-3 line-clamp-2">
+                <h3 className="text-xl font-bold text-base-content mb-3 line-clamp-2 h-[53px]">
                   {lesson.title}
                 </h3>
                 <p className="text-base-content/70 text-sm line-clamp-3 mb-4">
@@ -153,13 +152,18 @@ const MostSavedLessons = () => {
                 <div className="flex items-center gap-3 mb-4">
                   <Link to={`/profile/${lesson.authorEmail}`}>
                     <img
-                      src={lesson.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(lesson.authorName || 'User') + '&background=6366f1&color=fff'}
+                      src={
+                        lesson.authorImage ||
+                        'https://ui-avatars.com/api/?name=' +
+                          encodeURIComponent(lesson.authorName || 'User') +
+                          '&background=6366f1&color=fff'
+                      }
                       alt={lesson.authorName}
                       className="w-8 h-8 rounded-full hover:ring-2 hover:ring-primary transition-all cursor-pointer"
                     />
                   </Link>
                   <div className="flex-1">
-                    <Link 
+                    <Link
                       to={`/profile/${lesson.authorEmail}`}
                       className="text-sm font-medium text-base-content hover:text-primary transition-colors"
                     >
@@ -170,35 +174,6 @@ const MostSavedLessons = () => {
                       {new Date(lesson.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                </div>
-
-                {/* Stats */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-4 text-sm text-base-content/60">
-                    <span className="flex items-center gap-1">
-                      <FaEye className="w-4 h-4" />
-                      {Math.floor(Math.random() * 8000) + 1000}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FaHeart className="w-4 h-4" />
-                      {Math.floor(Math.random() * 300) + 100}
-                    </span>
-                    <span className="flex items-center gap-1 text-success font-semibold">
-                      <FaBookmark className="w-4 h-4" />
-                      {lesson.savesCount || Math.floor(Math.random() * 500) + 100}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Why It's Popular */}
-                <div className="bg-orange-500/10 p-3 rounded-xl mb-4 border border-orange-500/20">
-                  <p className="text-sm text-base-content/80">
-                    <span className="font-semibold text-orange-600">Why it's popular:</span> 
-                    {index === 0 && " Life-changing insights that resonate with everyone"}
-                    {index === 1 && " Practical wisdom for daily challenges"}
-                    {index === 2 && " Inspiring story of overcoming obstacles"}
-                    {index >= 3 && " Valuable lessons from real experiences"}
-                  </p>
                 </div>
 
                 {/* Read Button */}
@@ -222,17 +197,17 @@ const MostSavedLessons = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-center mt-12"
         >
-          <div className="bg-gradient-to-r from-orange-500/10 via-red-500/10 to-pink-500/10 p-8 rounded-3xl border border-orange-500/20 max-w-2xl mx-auto">
+          <div className="bg-linear-to-r from-orange-500/10 via-red-500/10 to-pink-500/10 p-8 rounded-3xl border border-orange-500/20 max-w-2xl mx-auto">
             <h3 className="text-2xl font-bold text-base-content mb-4">
               Create lessons worth saving
             </h3>
             <p className="text-base-content/70 mb-6">
-              Share your most valuable life experiences and insights. 
-              Help others learn from your journey and wisdom.
+              Share your most valuable life experiences and insights. Help
+              others learn from your journey and wisdom.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                to="/dashboard/add_lesson"
+                to="/dashboard/add-lesson"
                 className="btn btn-primary btn-lg hover:scale-105 transition-transform duration-200"
               >
                 <FaBookOpen className="w-5 h-5 mr-2" />

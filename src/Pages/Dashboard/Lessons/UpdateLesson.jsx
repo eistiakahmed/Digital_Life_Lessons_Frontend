@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import useAuth from '../../../hooks/useAuth';
 import useAxios from '../../../hooks/useAxios';
 import toast from 'react-hot-toast';
-import { invalidateLessonQueries } from '../../../utils/cacheUtils';
 import {
   FaArrowLeft,
   FaSave,
@@ -34,9 +32,11 @@ const UpdateLesson = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const axios = useAxios();
-  const queryClient = useQueryClient();
   
   const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [lesson, setLesson] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const {
     register,
@@ -61,13 +61,24 @@ const UpdateLesson = () => {
   }, [user?.email, axios]);
 
   // Fetch lesson details
-  const { data: lesson, isLoading } = useQuery({
-    queryKey: ['lesson', id],
-    queryFn: async () => {
-      const res = await axios.get(`/lessons/${id}`);
-      return res.data;
-    },
-  });
+  useEffect(() => {
+    const fetchLesson = async () => {
+      try {
+        setIsLoading(true);
+        const res = await axios.get(`/lessons/${id}`);
+        setLesson(res.data);
+      } catch (error) {
+        console.error('Failed to fetch lesson:', error);
+        setLesson(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchLesson();
+    }
+  }, [id, axios]);
 
   // Populate form when lesson data is loaded
   useEffect(() => {
@@ -75,7 +86,7 @@ const UpdateLesson = () => {
       // Check if user owns this lesson
       if (lesson.authorEmail !== user?.email) {
         toast.error('You can only edit your own lessons');
-        navigate('/dashboard/my_lessons');
+        navigate('/dashboard/my-lessons');
         return;
       }
 
@@ -90,13 +101,16 @@ const UpdateLesson = () => {
     }
   }, [lesson, setValue, user?.email, navigate]);
 
-  // Update lesson mutation
-  const updateLessonMutation = useMutation({
-    mutationFn: async (data) => {
-      if (data.accessLevel === 'Premium' && !isPremiumUser) {
-        throw new Error('You need Premium access to create Premium lessons!');
-      }
+  // Update lesson function
+  const updateLesson = async (data) => {
+    if (data.accessLevel === 'Premium' && !isPremiumUser) {
+      toast.error('You need Premium access to create Premium lessons!');
+      return;
+    }
 
+    try {
+      setIsUpdating(true);
+      
       const updatedLesson = {
         title: data.title,
         description: data.description,
@@ -108,26 +122,25 @@ const UpdateLesson = () => {
         updatedAt: new Date(),
       };
 
-      return axios.put(`/lessons/${id}`, updatedLesson);
-    },
-    onSuccess: () => {
+      await axios.put(`/lessons/${id}`, updatedLesson);
+      
       toast.success('Lesson updated successfully!');
-      // Invalidate lesson-related queries to update UI everywhere
-      invalidateLessonQueries(queryClient);
-      queryClient.invalidateQueries(['lesson', id]);
-      navigate('/dashboard/my_lessons');
-    },
-    onError: (error) => {
+      navigate('/dashboard/my-lessons');
+      
+    } catch (error) {
       toast.error(error.message || 'Failed to update lesson');
-    },
-  });
+      console.error(error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   const onSubmit = (data) => {
-    updateLessonMutation.mutate(data);
+    updateLesson(data);
   };
 
   const handleCancel = () => {
-    navigate('/dashboard/my_lessons');
+    navigate('/dashboard/my-lessons');
   };
 
   if (isLoading) {
@@ -372,11 +385,11 @@ const UpdateLesson = () => {
           <div className="flex flex-col sm:flex-row gap-4 pt-6">
             <button
               type="submit"
-              disabled={updateLessonMutation.isPending}
+              disabled={isUpdating}
               className="btn btn-primary flex-1 sm:flex-none"
             >
               <FaSave className="w-4 h-4 mr-2" />
-              {updateLessonMutation.isPending ? 'Updating...' : 'Update Lesson'}
+              {isUpdating ? 'Updating...' : 'Update Lesson'}
             </button>
             
             <button

@@ -104,14 +104,14 @@ const DashboardHome = () => {
       title: 'Create New Lesson',
       description: 'Share your wisdom with the community',
       icon: <FaPlus className="w-6 h-6" />,
-      link: '/dashboard/add_lesson',
+      link: '/dashboard/add-lesson',
       color: 'btn-primary',
     },
     {
       title: 'View My Lessons',
       description: 'Manage your created lessons',
       icon: <FaBookOpen className="w-6 h-6" />,
-      link: '/dashboard/my_lessons',
+      link: '/dashboard/my-lessons',
       color: 'btn-secondary',
     },
     {
@@ -253,7 +253,7 @@ const DashboardHome = () => {
               <FaBookOpen className="w-12 h-12 text-base-content/30 mx-auto mb-4" />
               <p className="text-base-content/60">No lessons created yet</p>
               <Link
-                to="/dashboard/add_lesson"
+                to="/dashboard/add-lesson"
                 className="btn btn-primary btn-sm mt-3"
               >
                 Create Your First Lesson

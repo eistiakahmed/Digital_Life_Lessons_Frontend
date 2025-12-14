@@ -32,15 +32,15 @@ const WhyLearningMatters = () => {
   return (
     <section className="py-16">
       <div className="px-4 text-center">
-        <h2 className="text-4xl font-bold mb-2 text-base-content dark:text-secondary">
+        <h2 className="text-5xl font-bold mb-2 text-primary">
           Why Learning From Life Matters
         </h2>
-        <p className="mb-12 text-base-content/70 dark:text-base-content/60 max-w-2xl mx-auto">
+        <p className="text-lg mb-12 text-base-content/70 dark:text-base-content/60 max-w-2xl mx-auto">
           Discover the benefits of reflecting on life lessons and learning from
           shared experiences.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 h-[250px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 ">
           {benefits.map((benefit, index) => (
             <div
               key={index}

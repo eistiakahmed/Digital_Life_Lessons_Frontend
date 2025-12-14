@@ -135,7 +135,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'admin/manage-users',
+        path: 'admin/manage_users',
         element: (
           <AdminRoutes>
             <ManageUsers />
@@ -143,7 +143,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'admin/manage-lessons',
+        path: 'admin/manage_lessons',
         element: (
           <AdminRoutes>
             <ManageLessons />
@@ -151,7 +151,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'admin/reported-lessons',
+        path: 'admin/reported_lessons',
         element: (
           <AdminRoutes>
             <ReportedLessons />

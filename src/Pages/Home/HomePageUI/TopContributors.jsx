@@ -15,18 +15,15 @@ import {
 const TopContributors = () => {
   const axios = useAxios();
 
-  
   const { data: topContributors = [], isLoading } = useQuery({
     queryKey: ['topContributors'],
     queryFn: async () => {
       const res = await axios.get('/users/top-contributors');
       return res.data.slice(0, 6);
     },
-    staleTime: 5 * 60 * 1000, 
-    cacheTime: 10 * 60 * 1000, 
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
   });
-
-  console.log(topContributors?.name);
 
   if (isLoading) {
     return (
@@ -38,9 +35,7 @@ const TopContributors = () => {
     );
   }
 
-  if (topContributors.length === 0) {
-    return null; 
-  }
+  if (topContributors.length === 0) return null;
 
   const getRankIcon = (index) => {
     switch (index) {
@@ -71,7 +66,7 @@ const TopContributors = () => {
   return (
     <section className="py-16 bg-base-200">
       <div className="px-4">
-        {/* Section Header */}
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -80,15 +75,15 @@ const TopContributors = () => {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <FaTrophy className="w-8 h-8 text-yellow-500" />
-            <h2 className="text-4xl font-bold text-base-content">
+            
+            <h2 className="text-5xl font-bold text-primary">
               Top Contributors This Week
             </h2>
-            <FaTrophy className="w-8 h-8 text-yellow-500" />
+            
           </div>
           <p className="text-lg text-base-content/70 max-w-3xl mx-auto">
-            Celebrating our community members who are sharing the most valuable 
-            life lessons and wisdom with everyone.
+            Celebrating community members sharing the most valuable life
+            lessons.
           </p>
         </motion.div>
 
@@ -103,34 +98,34 @@ const TopContributors = () => {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               whileHover={{ y: -5, scale: 1.02 }}
               className={`bg-base-100 rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border-2 ${
-                index === 0 
-                  ? 'border-yellow-500/50 bg-linear-to-br from-yellow-50/50 to-orange-50/50' 
-                  : index === 1 
+                index === 0
+                  ? 'border-yellow-500/50 bg-linear-to-br from-yellow-50/50 to-orange-50/50'
+                  : index === 1
                   ? 'border-gray-400/50 bg-linear-to-br from-gray-50/50 to-slate-50/50'
                   : index === 2
                   ? 'border-amber-600/50 bg-linear-to-br from-amber-50/50 to-orange-50/50'
                   : 'border-base-300'
               }`}
             >
-              {/* Rank Badge */}
               <div className="relative">
                 <div className="absolute top-4 left-4 z-10">
-                  <span className={`badge ${getRankBadge(index)} gap-1 shadow-lg text-white font-bold`}>
+                  <span
+                    className={`badge ${getRankBadge(
+                      index
+                    )} gap-1 shadow-lg text-white font-bold`}
+                  >
                     #{index + 1}
                   </span>
                 </div>
-                
-                {/* Premium Badge */}
+
                 {contributor.isPremium && (
                   <div className="absolute top-4 right-4 z-10">
                     <span className="badge badge-warning gap-1 shadow-lg">
-                      <FaCrown className="w-3 h-3" />
-                      Premium
+                      <FaCrown className="w-3 h-3" /> Premium
                     </span>
                   </div>
                 )}
 
-                {/* Profile Section */}
                 <div className="pt-12 pb-6 text-center">
                   <div className="relative inline-block">
                     <img
@@ -142,11 +137,9 @@ const TopContributors = () => {
                       {getRankIcon(index)}
                     </div>
                   </div>
-                  
-                  <h3 className="text-xl font-bold text-base-content mt-4 mb-2">
+                  <h3 className="text-xl font-bold mt-4 mb-2">
                     {contributor.name}
                   </h3>
-                  
                   <p className="text-base-content/60 text-sm">
                     Wisdom Contributor
                   </p>
@@ -154,47 +147,39 @@ const TopContributors = () => {
               </div>
 
               <div className="px-6 pb-6">
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center mb-1">
-                      <FaBookOpen className="w-4 h-4 text-blue-500" />
-                    </div>
-                    <p className="text-2xl font-bold text-base-content">
+                <div className="grid grid-cols-3 gap-4 mb-6 text-center">
+                  <div>
+                    <FaBookOpen className="w-4 h-4 text-blue-500 mx-auto mb-1" />
+                    <p className="text-2xl font-bold">
                       {contributor.lessonsCount || 0}
                     </p>
                     <p className="text-xs text-base-content/60">Lessons</p>
                   </div>
-                  
-                  <div className="text-center">
-                    <div className="flex items-center justify-center mb-1">
-                      <FaEye className="w-4 h-4 text-green-500" />
-                    </div>
-                    <p className="text-2xl font-bold text-base-content">
+                  <div>
+                    <FaEye className="w-4 h-4 text-green-500 mx-auto mb-1" />
+                    <p className="text-2xl font-bold">
                       {contributor.totalViews}
                     </p>
                     <p className="text-xs text-base-content/60">Views</p>
                   </div>
-                  
-                  <div className="text-center">
-                    <div className="flex items-center justify-center mb-1">
-                      <FaHeart className="w-4 h-4 text-red-500" />
-                    </div>
-                    <p className="text-2xl font-bold text-base-content">
+                  <div>
+                    <FaHeart className="w-4 h-4 text-red-500 mx-auto mb-1" />
+                    <p className="text-2xl font-bold">
                       {contributor.totalLikes}
                     </p>
                     <p className="text-xs text-base-content/60">Likes</p>
                   </div>
                 </div>
 
-                {/* Recent Achievement */}
-                <div className="bg-base-200 p-3 rounded-xl mb-4">
-                  <p className="text-sm text-base-content/70 text-center">
-                    <span className="font-semibold">Latest:</span> "{contributor.latestLesson?.title || 'Shared valuable insights'}"
+                <div className="bg-base-200 p-3 rounded-xl mb-4 text-center">
+                  <p className="text-sm text-base-content/70">
+                    <span className="font-semibold">Latest:</span> "
+                    {contributor.latestLesson?.title ||
+                      'Shared valuable insights'}
+                    "
                   </p>
                 </div>
 
-                {/* View Profile Button */}
                 <Link
                   to={`/profile/${contributor.email}`}
                   className="btn btn-primary w-full hover:scale-105 transition-transform duration-200"
@@ -206,7 +191,7 @@ const TopContributors = () => {
           ))}
         </div>
 
-        {/* Become a Contributor CTA */}
+        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -219,15 +204,13 @@ const TopContributors = () => {
               Want to be featured?
             </h3>
             <p className="text-base-content/70 mb-6">
-              Share your life lessons and wisdom with our community. 
-              The most impactful contributors get featured here!
+              Share your life lessons and wisdom with our community.
             </p>
             <Link
-              to="/dashboard/add_lesson"
+              to="/dashboard/add-lesson"
               className="btn btn-primary btn-lg hover:scale-105 transition-transform duration-200"
             >
-              <FaBookOpen className="w-5 h-5 mr-2" />
-              Share Your Wisdom
+              <FaBookOpen className="w-5 h-5 mr-2" /> Share Your Wisdom
             </Link>
           </div>
         </motion.div>

@@ -151,7 +151,9 @@ const FreeView = ({ handleUpgrade, isProcessing }) => (
             disabled={isProcessing}
             whileHover={{ scale: isProcessing ? 1 : 1.05 }}
             whileTap={{ scale: isProcessing ? 1 : 0.95 }}
-            className={`btn w-full bg-linear-to-r from-purple-500 via-blue-500 to-pink-500 text-white border-none text-lg font-bold ${isProcessing ? 'loading' : ''}`}
+            className={`btn w-full bg-linear-to-r from-purple-500 via-blue-500 to-pink-500 text-white border-none text-lg font-bold ${
+              isProcessing ? 'loading' : ''
+            }`}
           >
             {isProcessing ? (
               <>
@@ -180,8 +182,7 @@ const Pricing = () => {
   if (!loading && userDB?.role === 'admin') {
     return <Navigate to="/dashboard" replace />;
   }
-
-  const { data: currentUser, isLoading } = useQuery({
+  const { data: currentUser } = useQuery({
     queryKey: ['currentUser', user?.email],
     queryFn: async () => {
       if (!user?.email) return null;
@@ -191,6 +192,7 @@ const Pricing = () => {
     enabled: !!user?.email,
   });
 
+
   const handleUpgrade = async () => {
     if (!user?.email) {
       toast.error('Please log in to upgrade to premium.');
@@ -198,16 +200,16 @@ const Pricing = () => {
     }
 
     setIsProcessing(true);
-    
+
     try {
       toast.loading('Redirecting to payment...', { id: 'payment' });
-      
+
       const res = await axios.post('/create-checkout-session', {
         authorEmail: user.email,
       });
-      
+
       toast.dismiss('payment');
-      
+
       if (res.data?.url) {
         window.location.href = res.data.url;
       } else {
@@ -217,20 +219,25 @@ const Pricing = () => {
       toast.dismiss('payment');
       setIsProcessing(false);
       console.error('Payment error:', err);
-      
+
       if (err.response?.status === 404) {
         toast.error('Payment service not available. Please try again later.');
       } else if (err.response?.status === 500) {
         toast.error('Server error. Please contact support.');
       } else if (err.code === 'NETWORK_ERROR' || !err.response) {
-        toast.error('Cannot connect to payment service. Please check if the backend server is running.');
+        toast.error(
+          'Cannot connect to payment service. Please check if the backend server is running.'
+        );
       } else {
-        toast.error(err.response?.data?.message || 'Failed to initiate payment. Please try again.');
+        toast.error(
+          err.response?.data?.message ||
+            'Failed to initiate payment. Please try again.'
+        );
       }
     }
   };
 
-  if (loading || isLoading) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="loading loading-spinner loading-lg"></div>

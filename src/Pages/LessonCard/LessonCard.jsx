@@ -37,7 +37,7 @@ const LessonCard = ({ lesson }) => {
 
       {/* Lesson Image */}
       {lesson.image && (
-        <div className="h-[400px] overflow-hidden">
+        <div className="h-[300px] overflow-hidden">
           <img
             src={lesson.image}
             alt={lesson.title}
@@ -108,19 +108,7 @@ const LessonCard = ({ lesson }) => {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4 text-sm text-base-content/60">
-            <span className="flex items-center gap-1">
-              <FaEye className="w-4 h-4" />
-              {lesson.views || 0}
-            </span>
-            <span className="flex items-center gap-1">
-              <FaHeart className="w-4 h-4" />
-              {lesson.favorites || 0}
-            </span>
-          </div>
-        </div>
+        
 
         {/* Action Button */}
         <div className="">
