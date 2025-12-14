@@ -7,6 +7,8 @@ import toast from 'react-hot-toast';
 
 const Navbar = () => {
   const { user, userDB, LogoutUser } = useAuth();
+
+  console.log(user)
   
   
   const isAdmin = userDB?.role === 'admin';
@@ -72,7 +74,7 @@ const Navbar = () => {
         </NavLink>
       </li>
       
-      {/* Only show Pricing/Upgrade link for non-admin users */}
+      
       {!isAdmin && (
         <li>
           <NavLink
@@ -88,7 +90,7 @@ const Navbar = () => {
         </li>
       )}
       
-      {/* Show Admin Dashboard link for admin users */}
+      
       {isAdmin && (
         <li>
           <NavLink
@@ -148,6 +150,7 @@ const Navbar = () => {
                 <img
                   src={user.photoURL}
                   alt={user.displayName}
+                  referrerPolicy="no-referrer"
                   className="rounded-full w-[50px] h-[50px]"
                 />
               </div>
@@ -158,7 +161,7 @@ const Navbar = () => {
             >
               <li className="text-lg font-bold">{user.displayName}</li>
               <li className="text-xs border-b border-gray-200 pb-2">
-                {user.email}
+                {user?.email}
               </li>
               <li>
                 <Link to="/dashboard/profile">
@@ -184,7 +187,7 @@ const Navbar = () => {
             </ul>
           </div>
         ) : (
-          <div className='flex gap-2'>
+          <div className="flex gap-2">
             <button type="button">
               <Link to="/login" className="btn btn-primary btn-sm">
                 Login

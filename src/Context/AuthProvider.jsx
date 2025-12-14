@@ -13,9 +13,10 @@ import { auth } from '../Firebase/firebase.config';
 import axios from 'axios';
 
 const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('email');
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [userDB, setUserDB] = useState(null); // MongoDB user data
+  const [userDB, setUserDB] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const createUser = (email, password) => {
@@ -46,7 +47,7 @@ const AuthProvider = ({ children }) => {
     });
   };
 
-  // Fetch user data from MongoDB
+  
   const fetchUserData = async (email) => {
     try {
       const response = await axios.get(
@@ -60,22 +61,42 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      if (currentUser?.email) {
-        fetchUserData(currentUser.email);
+    const unSubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        
+        await currentUser.reload();
+        const refreshedUser = auth.currentUser;
+
+        
+        const providerEmail = refreshedUser?.providerData?.[0]?.email;
+
+        if (!refreshedUser.email && providerEmail) {
+          console.warn('Email was null, using providerData email');
+        }
+
+        setUser({
+          ...refreshedUser,
+          email: refreshedUser.email || providerEmail,
+        });
+
+        // MongoDB fetch
+        const finalEmail = refreshedUser.email || providerEmail;
+        if (finalEmail) {
+          fetchUserData(finalEmail);
+        }
       } else {
+        setUser(null);
         setUserDB(null);
       }
+
       setLoading(false);
-      //  console.log(currentUser);
     });
-    return () => {
-      unSubscribe();
-    };
+
+    return () => unSubscribe();
   }, []);
 
-  // Refresh user data function
+
+  
   const refreshUserData = async () => {
     if (user?.email) {
       await fetchUserData(user.email);

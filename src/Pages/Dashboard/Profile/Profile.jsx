@@ -18,13 +18,11 @@ import {
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
-
 const Profile = () => {
-  const { user, updateUserProfile } = useAuth();
+  const { user, updateUserProfile, loading } = useAuth();
   const axios = useAxios();
   const queryClient = useQueryClient();
-  
-  
+
   const [isUpdating, setIsUpdating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -32,16 +30,14 @@ const Profile = () => {
     photoURL: user?.photoURL || '',
   });
 
-  
-  const { data: currentUser, isLoading: userLoading } = useQuery({
+  const { data: currentUser } = useQuery({
     queryKey: ['currentUser', user?.email],
     queryFn: async () => {
       if (!user?.email) return null;
       const res = await axios.get(`/user/${user.email}`);
       return res.data;
     },
-    enabled: !!user?.email, 
-    
+    enabled: !!user?.email,
   });
 
   const { data: userLessons = [], isLoading: lessonsLoading } = useQuery({
@@ -52,10 +48,8 @@ const Profile = () => {
       return res.data;
     },
     enabled: !!user?.email,
-    
   });
 
-  
   useEffect(() => {
     setEditForm({
       displayName: user?.displayName || '',
@@ -71,11 +65,9 @@ const Profile = () => {
 
     try {
       setIsUpdating(true);
-      
-      // Update Firebase Auth profile
+
       await updateUserProfile(editForm.displayName, editForm.photoURL);
-      
-      // Update database
+
       await axios.put(`/user/${user.email}`, {
         displayName: editForm.displayName,
         photoURL: editForm.photoURL,
@@ -83,12 +75,10 @@ const Profile = () => {
 
       toast.success('Profile updated successfully!');
       setIsEditing(false);
-      
-      
+
       queryClient.invalidateQueries(['currentUser', user?.email]);
-      queryClient.invalidateQueries(['userLessons', user?.email]); 
-      queryClient.invalidateQueries(['topContributors']); 
-      
+      queryClient.invalidateQueries(['userLessons', user?.email]);
+      queryClient.invalidateQueries(['topContributors']);
     } catch (error) {
       toast.error('Failed to update profile');
       console.error(error);
@@ -105,7 +95,7 @@ const Profile = () => {
     setIsEditing(false);
   };
 
-  if (userLoading) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="loading loading-spinner loading-lg"></div>

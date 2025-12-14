@@ -65,6 +65,7 @@ const Register = () => {
     signInGoogle()
       .then(async (result) => {
         const user = result.user;
+        console.log(user.email)
 
         const userInfo = {
           name: user?.displayName,
@@ -235,6 +236,7 @@ const Register = () => {
                 <input
                   type="text"
                   {...register('image', { required: true })}
+                  
                   className="input input-bordered w-full bg-base-100 dark:bg-base-200 border-2 border-base-300 dark:border-base-content/20 focus:border-green-500 focus:outline-none transition-all"
                   placeholder="https://your-image-url.com/photo.jpg"
                 />
