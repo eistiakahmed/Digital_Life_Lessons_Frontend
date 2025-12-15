@@ -35,7 +35,7 @@ const ReportedLessons = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  /* ---------- Fetch Reports ---------- */
+  
   const fetchReportedLessons = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -54,7 +54,7 @@ const ReportedLessons = () => {
     fetchReportedLessons();
   }, [fetchReportedLessons]);
 
-  /* ---------- Actions ---------- */
+  
   const resolveReport = async (reportId, action) => {
     try {
       setIsProcessing(true);
@@ -81,7 +81,7 @@ const ReportedLessons = () => {
     }
   };
 
-  /* ---------- Data Processing ---------- */
+  
   const allReports = reportedLessons.flatMap((item) =>
     Array.isArray(item.reports)
       ? item.reports.map((report) => ({
@@ -152,7 +152,7 @@ const ReportedLessons = () => {
           <thead>
             <tr>
               <th>Serial No</th>
-              <th>Lesson</th>
+              <th>Lessons Title</th>
               <th>Reason</th>
               <th>Status</th>
               <th>Date</th>

@@ -17,7 +17,7 @@ const AdminRoutes = ({ children }) => {
   }
 
   if (!userDB || userDB.role !== 'admin') {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/dashboard " replace />;
   }
 
   return children;

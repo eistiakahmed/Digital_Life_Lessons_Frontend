@@ -16,9 +16,10 @@ import { Link } from 'react-router';
 
 const PublicProfile = () => {
   const { email } = useParams();
+  console.log(email)
   const axios = useAxios();
 
-  // Fetch user profile data
+  // Fetch user profile data  
   const { data: profileUser, isLoading: userLoading } = useQuery({
     queryKey: ['publicProfile', email],
     queryFn: async () => {
@@ -33,7 +34,7 @@ const PublicProfile = () => {
     queryKey: ['publicUserLessons', email],
     queryFn: async () => {
       const res = await axios.get(`/lessons/user/${email}`);
-      // Only return public lessons for public profile
+      
       return res.data.filter(lesson => lesson.privacy === 'Public');
     },
     enabled: !!email,
@@ -106,18 +107,18 @@ const PublicProfile = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="bg-gradient-to-r from-purple-500 via-blue-500 to-pink-500 p-8 rounded-3xl text-white shadow-2xl"
+          className="bg-linear-to-r from-purple-500 via-blue-500 to-pink-500 p-8 rounded-3xl text-white shadow-2xl"
         >
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="relative">
               <img
                 src={
-                  profileUser.image ||
+                  profileUser.photoURL ||
                   'https://ui-avatars.com/api/?name=' +
-                    encodeURIComponent(profileUser.name || 'User') +
+                    encodeURIComponent(profileUser.displayName || 'User') +
                     '&background=6366f1&color=fff'
                 }
-                alt={profileUser.name}
+                alt={profileUser?.displayName}
                 className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
               />
               {profileUser.isPremium && (
@@ -129,7 +130,7 @@ const PublicProfile = () => {
 
             <div className="flex-1 text-center md:text-left">
               <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
-                <h1 className="text-3xl font-bold">{profileUser.name}</h1>
+                <h1 className="text-3xl font-bold">{profileUser.displayName}</h1>
                 {profileUser.isPremium && (
                   <span className="badge badge-warning gap-1">
                     <FaCrown className="w-3 h-3" />
@@ -148,7 +149,7 @@ const PublicProfile = () => {
           </div>
         </motion.div>
 
-        {/* Statistics Cards */}
+        
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

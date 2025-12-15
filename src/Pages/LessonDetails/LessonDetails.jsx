@@ -30,7 +30,7 @@ const LessonDetails = () => {
   const [reportReason, setReportReason] = useState('');
   const [showReportModal, setShowReportModal] = useState(false);
 
-  // Fetch lesson details
+  
   const { data: lesson, isLoading } = useQuery({
     queryKey: ['lesson', id],
     queryFn: async () => {
@@ -41,7 +41,7 @@ const LessonDetails = () => {
 
   console.log(lesson)
 
-  // Fetch current user
+  
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser', user?.email],
     queryFn: async () => {
@@ -52,7 +52,7 @@ const LessonDetails = () => {
     enabled: !!user?.email,
   });
 
-  // Fetch comments
+  
   const { data: comments = [] } = useQuery({
     queryKey: ['comments', id],
     queryFn: async () => {
@@ -61,7 +61,7 @@ const LessonDetails = () => {
     },
   });
 
-  // Fetch similar lessons
+  
   const { data: similarLessons = [] } = useQuery({
     queryKey: ['similarLessons', lesson?.category, lesson?.emotion],
     queryFn: async () => {
@@ -72,7 +72,7 @@ const LessonDetails = () => {
     enabled: !!lesson,
   });
 
-  // Like mutation
+  
   const likeMutation = useMutation({
     mutationFn: async () => {
       if (!user) {
@@ -88,7 +88,7 @@ const LessonDetails = () => {
     },
   });
 
-  // Favorite mutation
+  
   const favoriteMutation = useMutation({
     mutationFn: async () => {
       if (!user) {
@@ -107,7 +107,7 @@ const LessonDetails = () => {
     },
   });
 
-  // Comment mutation
+  
   const commentMutation = useMutation({
     mutationFn: async (commentText) => {
       if (!user) {
@@ -129,7 +129,7 @@ const LessonDetails = () => {
     },
   });
 
-  // Report mutation
+  
   const reportMutation = useMutation({
     mutationFn: async (reason) => {
       if (!user) {
@@ -139,6 +139,7 @@ const LessonDetails = () => {
       }
       return axios.post('/lessons/report', {
         lessonId: id,
+        lessonTitle: lesson.title,
         reporterUserId: user.uid,
         reportedUserEmail: lesson.authorEmail,
         reason,
@@ -190,7 +191,7 @@ const LessonDetails = () => {
     );
   }
 
-  // Check if user can view premium content
+  
   const isPremiumLesson = lesson.accessLevel === 'Premium';
   const canViewPremium = currentUser?.isPremium || lesson.authorEmail === user?.email;
   
@@ -278,7 +279,7 @@ const LessonDetails = () => {
                 </span>
                 <span className="flex items-center gap-2">
                   <FaEye className="w-4 h-4" />
-                  {Math.floor(Math.random() * 10000)}  // views
+                  {Math.floor(Math.random() * 10000)} 
                 </span>
               </div>
             </div>
@@ -376,7 +377,7 @@ const LessonDetails = () => {
                 <form onSubmit={handleComment} className="mb-8">
                   <div className="flex gap-4">
                     <img
-                      src={user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'User') + '&background=6366f1&color=fff'}
+                      src={user.photoURL}
                       alt={user.displayName}
                       className="w-10 h-10 rounded-full"
                     />
@@ -415,7 +416,7 @@ const LessonDetails = () => {
                   <div key={comment._id} className="flex gap-4">
                     <Link to={`/profile/${comment.authorEmail}`}>
                       <img
-                        src={comment.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(comment.authorName || 'User') + '&background=6366f1&color=fff'}
+                        src={comment.authorImage}
                         alt={comment.authorName}
                         className="w-10 h-10 rounded-full hover:ring-2 hover:ring-primary transition-all cursor-pointer"
                       />

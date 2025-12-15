@@ -16,7 +16,6 @@ import {
   FaBars,
 } from 'react-icons/fa';
 
-
 const NavItem = ({ to, icon, label, end, activeColor, onClick }) => (
   <li>
     <NavLink
@@ -40,10 +39,8 @@ const NavItem = ({ to, icon, label, end, activeColor, onClick }) => (
 const DashboardLayouts = () => {
   const { LogoutUser, userDB } = useAuth();
 
-  // Safe role handling
   const role = userDB?.role;
   const isAdmin = role === 'admin';
-  
 
   const handleLogout = async () => {
     try {
@@ -54,7 +51,6 @@ const DashboardLayouts = () => {
     }
   };
 
-  
   const SidebarContent = ({ onNavClick }) => (
     <>
       <div className="text-2xl font-bold mb-8 flex justify-center text-primary">
@@ -62,7 +58,7 @@ const DashboardLayouts = () => {
       </div>
 
       <ul className="space-y-3 flex-1">
-        
+        {/* Admin Navigation */}
         {isAdmin ? (
           <>
             <NavItem
@@ -98,7 +94,6 @@ const DashboardLayouts = () => {
             />
           </>
         ) : (
-          
           <>
             <NavItem
               to="/dashboard"
@@ -143,15 +138,20 @@ const DashboardLayouts = () => {
 
   return (
     <div className="min-h-screen bg-base-200 transition-colors duration-300">
-      
       <div className="drawer lg:drawer-open">
-        <input id="dashboard-drawer" type="checkbox" className="drawer-toggle" />
-        
+        <input
+          id="dashboard-drawer"
+          type="checkbox"
+          className="drawer-toggle"
+        />
+
         <div className="drawer-content flex flex-col">
-          
           <div className="navbar bg-base-100 lg:hidden shadow-md">
             <div className="flex-none">
-              <label htmlFor="dashboard-drawer" className="btn btn-square btn-ghost">
+              <label
+                htmlFor="dashboard-drawer"
+                className="btn btn-square btn-ghost"
+              >
                 <FaBars className="w-5 h-5" />
               </label>
             </div>
@@ -170,7 +170,6 @@ const DashboardLayouts = () => {
             </div>
           </div>
 
-          
           <div className="hidden lg:flex w-11/12 mx-auto gap-6 py-6">
             {/* Desktop Sidebar */}
             <aside className="w-64 min-h-[95vh] bg-base-100 rounded-xl shadow-lg p-6 flex flex-col z-20">
@@ -212,9 +211,8 @@ const DashboardLayouts = () => {
         <div className="drawer-side lg:hidden">
           <label htmlFor="dashboard-drawer" className="drawer-overlay"></label>
           <aside className="w-64 min-h-full bg-base-100 p-6 flex flex-col">
-            <SidebarContent 
+            <SidebarContent
               onNavClick={() => {
-                
                 document.getElementById('dashboard-drawer').checked = false;
               }}
             />

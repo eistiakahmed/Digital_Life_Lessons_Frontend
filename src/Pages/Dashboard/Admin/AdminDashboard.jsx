@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router';
-import useAuth from '../../../hooks/useAuth';
+
 import useAxios from '../../../hooks/useAxios';
 import {
   FaUsers,
@@ -9,13 +9,11 @@ import {
   FaFlag,
   FaChartLine,
   FaCrown,
-  FaCalendarAlt,
   FaEye,
   FaHeart,
 } from 'react-icons/fa';
 
 const AdminDashboard = () => {
-  const { user } = useAuth();
   const axios = useAxios();
 
   // Fetch all users
@@ -47,23 +45,27 @@ const AdminDashboard = () => {
 
   // Calculate stats
   const totalUsers = allUsers.length;
-  const premiumUsers = allUsers.filter(user => user.isPremium).length;
-  const totalPublicLessons = allLessons.filter(lesson => lesson.privacy === 'Public').length;
-  const totalPrivateLessons = allLessons.filter(lesson => lesson.privacy === 'Private').length;
+  const premiumUsers = allUsers.filter((user) => user.isPremium).length;
+  const totalPublicLessons = allLessons.filter(
+    (lesson) => lesson.privacy === 'Public'
+  ).length;
+  const totalPrivateLessons = allLessons.filter(
+    (lesson) => lesson.privacy === 'Private'
+  ).length;
   const totalReports = reportedLessons.length;
 
-  // Get today's new lessons
+  
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const todayLessons = allLessons.filter(lesson => 
-    new Date(lesson.createdAt) >= today
+  const todayLessons = allLessons.filter(
+    (lesson) => new Date(lesson.createdAt) >= today
   ).length;
 
-  // Get this week's new users
+  
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  const weeklyUsers = allUsers.filter(user => 
-    new Date(user.createdAt) >= oneWeekAgo
+  const weeklyUsers = allUsers.filter(
+    (user) => new Date(user.createdAt) >= oneWeekAgo
   ).length;
 
   const stats = [
@@ -81,7 +83,7 @@ const AdminDashboard = () => {
       icon: <FaCrown className="w-8 h-8" />,
       color: 'from-yellow-500 to-orange-500',
       bgColor: 'bg-yellow-500/10',
-      change: `${Math.round((premiumUsers/totalUsers)*100)}% conversion`,
+      change: `${Math.round((premiumUsers / totalUsers) * 100)}% conversion`,
     },
     {
       title: 'Public Lessons',
@@ -141,9 +143,7 @@ const AdminDashboard = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">
-              Admin Dashboard 👑
-            </h1>
+            <h1 className="text-3xl font-bold mb-2">Admin Dashboard 👑</h1>
             <p className="text-white/80">
               Platform overview and management controls
             </p>
@@ -183,9 +183,7 @@ const AdminDashboard = () => {
               <p className="text-base-content/60 text-sm font-medium mb-2">
                 {stat.title}
               </p>
-              <p className="text-xs text-base-content/50">
-                {stat.change}
-              </p>
+              <p className="text-xs text-base-content/50">{stat.change}</p>
             </div>
           </div>
         ))}
@@ -250,10 +248,22 @@ const AdminDashboard = () => {
                     by {lesson.authorName}
                   </p>
                   <div className="flex items-center gap-4 mt-2">
-                    <span className={`badge ${lesson.privacy === 'Public' ? 'badge-success' : 'badge-warning'} badge-sm`}>
+                    <span
+                      className={`badge ${
+                        lesson.privacy === 'Public'
+                          ? 'badge-success'
+                          : 'badge-warning'
+                      } badge-sm`}
+                    >
                       {lesson.privacy}
                     </span>
-                    <span className={`badge ${lesson.accessLevel === 'Free' ? 'badge-info' : 'badge-error'} badge-sm`}>
+                    <span
+                      className={`badge ${
+                        lesson.accessLevel === 'Free'
+                          ? 'badge-info'
+                          : 'badge-error'
+                      } badge-sm`}
+                    >
                       {lesson.accessLevel}
                     </span>
                   </div>
@@ -311,12 +321,19 @@ const AdminDashboard = () => {
             <div className="flex items-center justify-between">
               <span className="text-base-content/70">Premium Conversion</span>
               <span className="text-2xl font-bold text-yellow-500">
-                {totalUsers > 0 ? Math.round((premiumUsers/totalUsers)*100) : 0}%
+                {totalUsers > 0
+                  ? Math.round((premiumUsers / totalUsers) * 100)
+                  : 0}
+                %
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-base-content/70">Content Moderation</span>
-              <span className={`text-2xl font-bold ${totalReports > 0 ? 'text-red-500' : 'text-green-500'}`}>
+              <span
+                className={`text-2xl font-bold ${
+                  totalReports > 0 ? 'text-red-500' : 'text-green-500'
+                }`}
+              >
                 {totalReports > 0 ? `${totalReports} Reports` : 'Clean'}
               </span>
             </div>
@@ -324,13 +341,14 @@ const AdminDashboard = () => {
 
           {totalReports > 0 && (
             <div className="mt-6 p-4 bg-red-500/10 rounded-xl border border-red-500/20">
-              <h3 className="font-bold text-red-600 mb-2">
-                Action Required
-              </h3>
+              <h3 className="font-bold text-red-600 mb-2">Action Required</h3>
               <p className="text-sm text-base-content/70 mb-3">
                 {totalReports} reported lessons need your attention
               </p>
-              <Link to="/dashboard/admin/reported-lessons" className="btn btn-error btn-sm">
+              <Link
+                to="/dashboard/admin/reported_lessons"
+                className="btn btn-error btn-sm"
+              >
                 <FaFlag className="w-4 h-4 mr-2" />
                 Review Reports
               </Link>
