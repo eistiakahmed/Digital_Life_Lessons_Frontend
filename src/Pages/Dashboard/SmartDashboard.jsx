@@ -14,12 +14,12 @@ const SmartDashboard = () => {
     );
   }
 
-  // If user role is admin, show admin dashboard
+  
   if (userDB?.role === 'admin') {
     return <AdminDashboard />;
   }
 
-  // Otherwise show user dashboard
+  
   return <UserDashboard />;
 };
 

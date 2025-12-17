@@ -30,10 +30,13 @@ import {
   FaCrown,
   FaRegSmile,
   FaBookOpen,
+  FaRegEye,
 } from 'react-icons/fa';
-import { MdMood, MdOutlineUpdate } from 'react-icons/md';
+import { MdBookmark, MdMood, MdOutlineUpdate } from 'react-icons/md';
 import { HiOutlineViewGrid } from 'react-icons/hi';
 import { TbWorld } from 'react-icons/tb';
+import { FcLike } from 'react-icons/fc';
+
 
 const LessonDetails = () => {
   const { id } = useParams();
@@ -298,6 +301,21 @@ const LessonDetails = () => {
                   </span>
                 </div>
 
+                {/* Stats & Engagement Section */}
+
+                <div className="flex flex-wrap justify-evenly items-center gap-4 font-semibold bg-white mb-6 py-10 rounded-xl">
+                  <span className="flex items-center gap-2">
+                    <FcLike size={25} /> {lesson.likesCount || 0} Likes
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <MdBookmark size={25} /> {lesson.favoritesCount} Favorite
+                  </span>
+
+                  <span className="flex items-center gap-2">
+                    <FaRegEye size={25} /> {randomViews} views
+                  </span>
+                </div>
+
                 {/* Interaction Buttons */}
                 <div className="flex flex-wrap justify-evenly gap-4 mb-10 bg-white py-6 rounded-xl shadow-sm">
                   {/* LIKE */}
@@ -319,7 +337,7 @@ const LessonDetails = () => {
                         ) : (
                           <FaRegHeart className="text-lg" />
                         )}
-                        <span>{lesson.likesCount || 0}</span>
+                        <span>Like</span>
                       </>
                     )}
                   </button>
