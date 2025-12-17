@@ -4,6 +4,8 @@ import Home from '../Pages/Home/Home';
 import DashboardLayouts from '../Layouts/DashboardLayouts';
 import Pricing from '../Pages/Pricing/Pricing';
 import DashboardHome from '../Pages/Dashboard/DashboardHome/DashboardHome';
+import UserDashboard from '../Pages/Dashboard/UserDashboard/UserDashboard';
+import SmartDashboard from '../Pages/Dashboard/SmartDashboard';
 import Login from '../Pages/Auth/Login';
 import Register from '../Pages/Auth/Register';
 import PublicLessons from '../Pages/PublicLessons/PublicLessons';
@@ -95,7 +97,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <DashboardHome />,
+        element: <SmartDashboard />,
       },
       {
         path: 'add_lesson',

@@ -1,78 +1,117 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import useAuth from '../../hooks/useAuth';
 import useAxios from '../../hooks/useAxios';
 import toast from 'react-hot-toast';
 import {
+  FacebookShareButton,
+  TwitterShareButton,
+  LinkedinShareButton,
+  WhatsappShareButton,
+  FacebookIcon,
+  TwitterIcon,
+  LinkedinIcon,
+  WhatsappIcon,
+} from 'react-share';
+import {
   FaHeart,
+  FaRegHeart,
   FaBookmark,
-  FaEye,
-  FaCalendarAlt,
-  FaUser,
-  FaCrown,
-  FaFlag,
+  FaRegBookmark,
   FaShare,
+  FaFlag,
+  FaEye,
   FaClock,
-  FaArrowLeft,
-  FaComment,
+  FaCalendarAlt,
+  FaUserCircle,
+  FaTimes,
+  FaCrown,
+  FaRegSmile,
+  FaBookOpen,
 } from 'react-icons/fa';
+import { MdMood, MdOutlineUpdate } from 'react-icons/md';
+import { HiOutlineViewGrid } from 'react-icons/hi';
+import { TbWorld } from 'react-icons/tb';
 
 const LessonDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const axios = useAxios();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
-  
-  const [comment, setComment] = useState('');
-  const [reportReason, setReportReason] = useState('');
-  const [showReportModal, setShowReportModal] = useState(false);
 
-  
+  const [liked, setLiked] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [comment, setComment] = useState('');
+
+  const randomViews = Math.floor(Math.random() * 10000);
+
   const { data: lesson, isLoading } = useQuery({
     queryKey: ['lesson', id],
-    queryFn: async () => {
-      const res = await axios.get(`/lessons/${id}`);
-      return res.data;
-    },
+    queryFn: async () => (await axios.get(`/lessons/${id}`)).data,
   });
 
-  console.log(lesson)
-
-  
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser', user?.email],
-    queryFn: async () => {
-      if (!user?.email) return null;
-      const res = await axios.get(`/user/${user.email}`);
-      return res.data;
-    },
+    queryFn: async () => (await axios.get(`/user/${user.email}`)).data,
     enabled: !!user?.email,
   });
 
-  
   const { data: comments = [] } = useQuery({
     queryKey: ['comments', id],
+    queryFn: async () => (await axios.get(`/lessons/${id}/comments`)).data,
+  });
+
+  const { data: similarLessons = [], isLoading: similarLoading } = useQuery({
+    queryKey: ['similar-lessons', lesson?.category, lesson?.emotion, id],
     queryFn: async () => {
-      const res = await axios.get(`/lessons/${id}/comments`);
+      if (!lesson?.category || !lesson?.emotion) return [];
+
+      const res = await axios.get(
+        `/lessons/similar?category=${lesson.category}&emotion=${lesson.emotion}&exclude=${id}`
+      );
+
       return res.data;
     },
+    enabled: !!lesson && !!lesson.category && !!lesson.emotion,
+    retry: 1,
   });
 
-  
-  const { data: similarLessons = [] } = useQuery({
-    queryKey: ['similarLessons', lesson?.category, lesson?.emotion],
+  const { data: userFavorites = [] } = useQuery({
+    queryKey: ['favorites', user?.email],
+    enabled: !!user?.email,
+    queryFn: async () =>
+      (await axios.get(`/favorites/user/${user.email}`)).data,
+  });
+
+  // Fetch author's total lessons count
+  const { data: authorLessons = [] } = useQuery({
+    queryKey: ['authorLessons', lesson?.authorEmail],
     queryFn: async () => {
-      if (!lesson) return [];
-      const res = await axios.get(`/lessons/similar?category=${lesson.category}&emotion=${lesson.emotion}&exclude=${id}`);
-      return res.data.slice(0, 6);
+      const res = await axios.get(`/lessons/user/${lesson.authorEmail}`);
+      return res.data;
     },
-    enabled: !!lesson,
+    enabled: !!lesson?.authorEmail,
   });
 
-  
+  useEffect(() => {
+    if (lesson && user) {
+      setLiked(Array.isArray(lesson.likes) && lesson.likes.includes(user.uid));
+    }
+  }, [lesson, user]);
+
+  useEffect(() => {
+    if (userFavorites.length && lesson) {
+      const isSaved = userFavorites.some((fav) => fav.lessonId === lesson._id);
+      setSaved(isSaved);
+    }
+  }, [userFavorites, lesson]);
+
   const likeMutation = useMutation({
     mutationFn: async () => {
       if (!user) {
@@ -82,451 +121,580 @@ const LessonDetails = () => {
       }
       return axios.post(`/lessons/${id}/like`, { userId: user.uid });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries(['lesson', id]);
-      toast.success('Liked!');
+      setLiked(!liked);
+      if (data?.data?.isLiked) {
+        toast.success('Lesson liked!');
+      } else {
+        toast.success('Like removed');
+      }
     },
   });
 
-  
-  const favoriteMutation = useMutation({
+  const saveMutation = useMutation({
     mutationFn: async () => {
       if (!user) {
         toast.error('Please log in to save');
         navigate('/login');
         return;
       }
-      return axios.post(`/lessons/${id}/favorite`, { 
+      return axios.post(`/lessons/${id}/favorite`, {
         userId: user.uid,
-        userEmail: user.email 
+        userEmail: user.email,
       });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries(['favorites', user.email]);
       queryClient.invalidateQueries(['lesson', id]);
-      toast.success('Saved to favorites!');
+      setSaved(true);
+      toast.success('Lesson saved to favorites');
     },
   });
 
-  
+  const removeFavoriteMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) {
+        toast.error('Please log in');
+        return;
+      }
+      return axios.delete(`/favorites/${id}`, {
+        data: { userEmail: user.email },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['favorites', user.email]);
+      queryClient.invalidateQueries(['lesson', id]);
+      setSaved(false);
+      toast.success('Lesson removed from favorites');
+    },
+  });
+
+  const reportMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) {
+        toast.error('Please log in to report');
+        navigate('/login');
+        return;
+      }
+      if (!reportReason) {
+        toast.error('Please select a reason');
+        return;
+      }
+      return axios.post('/lessons/report', {
+        lessonId: lesson._id,
+        reporterUserId: user?.uid,
+        reporterEmail: user?.email,
+        reason: reportReason,
+      });
+    },
+    onSuccess: () => {
+      setShowReport(false);
+      setReportReason('');
+      toast.success('Report submitted successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to submit report');
+      console.error('Report error:', error);
+    },
+  });
+
   const commentMutation = useMutation({
-    mutationFn: async (commentText) => {
+    mutationFn: async () => {
       if (!user) {
         toast.error('Please log in to comment');
         navigate('/login');
         return;
       }
+      if (!comment.trim()) {
+        toast.error('Please write a comment');
+        return;
+      }
       return axios.post(`/lessons/${id}/comments`, {
-        text: commentText,
+        text: comment.trim(),
         authorName: user.displayName,
         authorEmail: user.email,
         authorImage: user.photoURL,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['comments', id]);
       setComment('');
-      toast.success('Comment added!');
+      queryClient.invalidateQueries(['comments', id]);
+      toast.success('Comment posted successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to post comment');
+      console.error('Comment error:', error);
     },
   });
 
-  
-  const reportMutation = useMutation({
-    mutationFn: async (reason) => {
-      if (!user) {
-        toast.error('Please log in to report');
-        navigate('/login');
-        return;
-      }
-      return axios.post('/lessons/report', {
-        lessonId: id,
-        lessonTitle: lesson.title,
-        reporterUserId: user.uid,
-        reportedUserEmail: lesson.authorEmail,
-        reason,
-      });
-    },
-    onSuccess: () => {
-      setShowReportModal(false);
-      setReportReason('');
-      toast.success('Report submitted');
-    },
-  });
-
-  const handleComment = (e) => {
-    e.preventDefault();
-    if (!comment.trim()) return;
-    commentMutation.mutate(comment);
-  };
-
-  const handleReport = () => {
-    if (!reportReason) {
-      toast.error('Please select a reason');
-      return;
-    }
-    reportMutation.mutate(reportReason);
-  };
-
-  const estimateReadingTime = (text) => {
-    const wordsPerMinute = 200;
-    const words = text.split(' ').length;
-    return Math.ceil(words / wordsPerMinute);
-  };
+  const readingTime = (text = '') => Math.ceil(text.split(' ').length / 200);
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="loading loading-spinner loading-lg"></div>
+        <span className="loading loading-spinner loading-lg"></span>
       </div>
     );
   }
 
-  if (!lesson) {
-    return (
-      <div className="text-center py-16">
-        <h2 className="text-2xl font-bold mb-4">Lesson not found</h2>
-        <Link to="/public_lessons" className="btn btn-primary">
-          Browse Lessons
-        </Link>
-      </div>
-    );
-  }
+  if (!lesson) return null;
 
-  
-  const isPremiumLesson = lesson.accessLevel === 'Premium';
-  const canViewPremium = currentUser?.isPremium || lesson.authorEmail === user?.email;
-  
-  if (isPremiumLesson && !canViewPremium) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-base-200">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-base-100 p-12 rounded-3xl shadow-2xl text-center max-w-md"
-        >
-          <FaCrown className="w-20 h-20 mx-auto mb-6 text-yellow-500" />
-          <h1 className="text-3xl font-bold mb-4">Premium Content</h1>
-          <p className="text-base-content/70 mb-6">
-            This lesson is exclusive to Premium members. Upgrade to access this and all premium content.
-          </p>
-          <Link to="/pricing" className="btn btn-warning btn-lg">
-            <FaCrown className="w-5 h-5 mr-2" />
-            Upgrade to Premium
-          </Link>
-        </motion.div>
-      </div>
-    );
-  }
+  const isPremium = lesson.accessLevel === 'Premium';
+  const canView = currentUser?.isPremium || lesson.authorEmail === user?.email;
 
   return (
-    <div className="min-h-screen bg-base-200 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Back Button */}
-        <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          onClick={() => navigate(-1)}
-          className="btn btn-ghost mb-6"
-        >
-          <FaArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </motion.button>
-
-        {/* Main Content */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="bg-base-100 rounded-3xl shadow-lg overflow-hidden"
-        >
-          {/* Featured Image */}
-          {lesson.image && (
-            <div className="h-64 md:h-80 overflow-hidden">
-              <img
-                src={lesson.image}
-                alt={lesson.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
-
-          <div className="p-8">
-            {/* Header */}
-            <div className="mb-8">
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="badge badge-primary">{lesson.category}</span>
-                <span className="badge badge-secondary">{lesson.emotion}</span>
-                {isPremiumLesson && (
-                  <span className="badge badge-warning gap-1">
-                    <FaCrown className="w-3 h-3" />
-                    Premium
-                  </span>
-                )}
-              </div>
-              
-              <h1 className="text-4xl font-bold text-base-content mb-4">
-                {lesson.title}
-              </h1>
-
-              {/* Metadata */}
-              <div className="flex flex-wrap items-center gap-6 text-sm text-base-content/60 mb-6">
-                <span className="flex items-center gap-2">
-                  <FaCalendarAlt className="w-4 h-4" />
-                  {new Date(lesson.createdAt).toLocaleDateString()}
-                </span>
-                <span className="flex items-center gap-2">
-                  <FaClock className="w-4 h-4" />
-                  {estimateReadingTime(lesson.description)} min read
-                </span>
-                <span className="flex items-center gap-2">
-                  <FaEye className="w-4 h-4" />
-                  {Math.floor(Math.random() * 10000)} 
-                </span>
-              </div>
-            </div>
-
-            {/* Author Section */}
-            <div className="bg-base-200 p-6 rounded-2xl mb-8">
-              <div className="flex items-center gap-4">
-                <img
-                  src={lesson.authorImage || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(lesson.authorName || 'User') + '&background=6366f1&color=fff'}
-                  alt={lesson.authorName}
-                  className="w-16 h-16 rounded-full"
-                />
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-base-content">
-                    {lesson.authorName}
-                  </h3>
-                  <p className="text-base-content/60">
-                    Sharing wisdom and life experiences
-                  </p>
-                </div>
-                <Link
-                  to={`/profile/${lesson.authorEmail}`}
-                  className="btn btn-outline btn-sm"
-                >
-                  <FaUser className="w-4 h-4 mr-2" />
-                  View Profile
-                </Link>
-              </div>
-            </div>
-
-            {/* Lesson Content */}
-            <div className="prose prose-lg max-w-none mb-8">
-              <div className="text-base-content leading-relaxed whitespace-pre-wrap">
-                {lesson.description}
-              </div>
-            </div>
-
-            {/* Engagement Stats */}
-            <div className="flex items-center justify-between mb-8 p-6 bg-base-200 rounded-2xl">
-              <div className="flex items-center gap-6">
-                <span className="flex items-center gap-2 text-base-content/60">
-                  <FaHeart className="w-5 h-5 text-red-500" />
-                  {lesson.likesCount || 0} Likes
-                </span>
-                <span className="flex items-center gap-2 text-base-content/60">
-                  <FaBookmark className="w-5 h-5 text-blue-500" />
-                  {lesson.favoritesCount || 0} Saved
-                </span>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-wrap gap-4 mb-8">
-              <button
-                onClick={() => likeMutation.mutate()}
-                disabled={likeMutation.isPending}
-                className="btn btn-outline btn-error"
-              >
-                <FaHeart className="w-4 h-4 mr-2" />
-                Like
-              </button>
-              
-              <button
-                onClick={() => favoriteMutation.mutate()}
-                disabled={favoriteMutation.isPending}
-                className="btn btn-outline btn-info"
-              >
-                <FaBookmark className="w-4 h-4 mr-2" />
-                Save to Favorites
-              </button>
-              
-              <button
-                onClick={() => setShowReportModal(true)}
-                className="btn btn-outline btn-warning"
-              >
-                <FaFlag className="w-4 h-4 mr-2" />
-                Report
-              </button>
-              
-              <button className="btn btn-outline btn-success">
-                <FaShare className="w-4 h-4 mr-2" />
-                Share
-              </button>
-            </div>
-
-            {/* Comments Section */}
-            <div className="border-t border-base-300 pt-8">
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                <FaComment className="w-6 h-6 text-primary" />
-                Comments ({comments.length})
-              </h3>
-
-              {/* Add Comment Form */}
-              {user ? (
-                <form onSubmit={handleComment} className="mb-8">
-                  <div className="flex gap-4">
+    <div className="min-h-screen bg-base-200/40">
+      <div className="mx-auto px-4 py-10">
+        {isPremium && !canView ? (
+          <div className="bg-base-100 p-10 rounded-xl text-center border">
+            <FaCrown className="w-14 h-14 mx-auto text-yellow-500 mb-4" />
+            <h2 className="text-2xl font-semibold mb-2">Premium Lesson</h2>
+            <p className="text-base-content/60 mb-6">
+              Upgrade to Premium to unlock full content.
+            </p>
+            <Link to="/pricing" className="btn btn-warning">
+              Upgrade Now
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="flex gap-15">
+              <div className="flex-1">
+                <div className="mb-8">
+                  {lesson.image ? (
                     <img
-                      src={user.photoURL}
-                      alt={user.displayName}
-                      className="w-10 h-10 rounded-full"
+                      src={lesson.image}
+                      alt=""
+                      className="rounded-xl w-full"
                     />
-                    <div className="flex-1">
-                      <textarea
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        placeholder="Share your thoughts..."
-                        className="textarea textarea-bordered w-full"
-                        rows="3"
-                      />
-                      <button
-                        type="submit"
-                        disabled={!comment.trim() || commentMutation.isPending}
-                        className="btn btn-primary btn-sm mt-2"
-                      >
-                        Post Comment
-                      </button>
+                  ) : (
+                    <div className="h-[450px] rounded-xl bg-linear-to-br from-orange-500/20 via-red-500/20 to-pink-500/20 flex items-center justify-center">
+                      <FaBookOpen className="w-16 h-16 text-base-content/30" />
                     </div>
-                  </div>
-                </form>
-              ) : (
-                <div className="text-center py-8 bg-base-200 rounded-2xl mb-8">
-                  <p className="text-base-content/60 mb-4">
-                    Please log in to leave a comment
-                  </p>
-                  <Link to="/login" className="btn btn-primary">
-                    Log In
-                  </Link>
+                  )}
                 </div>
-              )}
+                <div className="flex flex-wrap justify-evenly items-center gap-4 text-sm bg-white mb-6 py-5 rounded-xl">
+                  <span className="flex flex-col justify-center items-center gap-1">
+                    <FaCalendarAlt size={25} className="text-blue-500" />
+                    {new Date(lesson.createdAt).toLocaleDateString()}
+                  </span>
 
-              {/* Comments List */}
-              <div className="space-y-6">
-                {comments.map((comment) => (
-                  <div key={comment._id} className="flex gap-4">
-                    <Link to={`/profile/${comment.authorEmail}`}>
-                      <img
-                        src={comment.authorImage}
-                        alt={comment.authorName}
-                        className="w-10 h-10 rounded-full hover:ring-2 hover:ring-primary transition-all cursor-pointer"
-                      />
-                    </Link>
-                    <div className="flex-1">
-                      <div className="bg-base-200 p-4 rounded-2xl">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Link 
-                            to={`/profile/${comment.authorEmail}`}
-                            className="font-medium text-base-content hover:text-primary transition-colors"
-                          >
-                            {comment.authorName}
-                          </Link>
-                          <span className="text-xs text-base-content/60">
-                            {new Date(comment.createdAt).toLocaleDateString()}
+                  <span className="flex flex-col justify-center items-center gap-1">
+                    <MdOutlineUpdate size={28} className="text-green-500" />
+                    {lesson?.updatedAt
+                      ? new Date(lesson.updatedAt).toLocaleDateString()
+                      : 'Not updated'}
+                  </span>
+
+                  <span className="flex flex-col justify-center items-center gap-1">
+                    <TbWorld size={25} className="text-purple-500" />
+                    {lesson.privacy}
+                  </span>
+
+                  <span className="flex flex-col justify-center items-center gap-1">
+                    <FaClock size={25} className="text-orange-500" />
+                    {readingTime(lesson.description)} min read
+                  </span>
+                </div>
+
+                {/* Interaction Buttons */}
+                <div className="flex flex-wrap justify-evenly gap-4 mb-10 bg-white py-6 rounded-xl shadow-sm">
+                  {/* LIKE */}
+                  <button
+                    onClick={() => likeMutation.mutate()}
+                    disabled={likeMutation.isPending}
+                    className={`btn btn-sm flex items-center gap-2 transition-all duration-300 ${
+                      liked ? 'btn-error text-white' : 'btn-ghost text-gray-600'
+                    } hover:scale-105 ${
+                      likeMutation.isPending ? 'loading' : ''
+                    }`}
+                  >
+                    {likeMutation.isPending ? (
+                      <span className="loading loading-spinner loading-xs"></span>
+                    ) : (
+                      <>
+                        {liked ? (
+                          <FaHeart className="text-lg animate-pulse" />
+                        ) : (
+                          <FaRegHeart className="text-lg" />
+                        )}
+                        <span>{lesson.likesCount || 0}</span>
+                      </>
+                    )}
+                  </button>
+
+                  {/* SAVE */}
+                  <button
+                    onClick={() =>
+                      saved
+                        ? removeFavoriteMutation.mutate()
+                        : saveMutation.mutate()
+                    }
+                    disabled={
+                      saveMutation.isPending || removeFavoriteMutation.isPending
+                    }
+                    className={`btn btn-sm flex items-center gap-2 transition-all duration-300 ${
+                      saved ? 'btn-info text-white' : 'btn-ghost text-gray-600'
+                    } hover:scale-105 ${
+                      saveMutation.isPending || removeFavoriteMutation.isPending
+                        ? 'loading'
+                        : ''
+                    }`}
+                  >
+                    {saveMutation.isPending ||
+                    removeFavoriteMutation.isPending ? (
+                      <span className="loading loading-spinner loading-xs"></span>
+                    ) : (
+                      <>
+                        {saved ? (
+                          <FaBookmark className="text-lg" />
+                        ) : (
+                          <FaRegBookmark className="text-lg" />
+                        )}
+                        <span>Save</span>
+                      </>
+                    )}
+                  </button>
+
+                  {/* SHARE */}
+                  <button
+                    onClick={() => setShowShare(true)}
+                    className=" btn btn-sm btn-ghost flex items-center gap-2 text-gray-600 hover:text-primary hover:bg-primary/10 transition-all duration-300 hover:scale-105"
+                  >
+                    <FaShare className="text-lg" />
+                    Share
+                  </button>
+
+                  {/* REPORT */}
+                  <button
+                    onClick={() => setShowReport(true)}
+                    className="btn btn-sm btn-ghost flex items-center gap-2 text-warning hover:bg-warning/10 transition-all duration-300 hover:scale-105"
+                  >
+                    <FaFlag className="text-lg" />
+                    Report
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex-1">
+                <h1 className="text-3xl md:text-4xl font-semibold mb-4">
+                  {lesson.title}
+                </h1>
+                <article className="prose prose-lg max-w-none mb-10">
+                  {lesson.description}
+                </article>
+
+                <div className="flex items-center gap-4 mb-6">
+                  <span className="flex items-center gap-2 bg-blue-500 px-4 py-2 rounded-full text-white text-sm font-medium">
+                    <HiOutlineViewGrid className="w-4 h-4" />
+                    {lesson.category}
+                  </span>
+
+                  <span className="flex items-center gap-2 bg-green-500 px-4 py-2 rounded-full text-white text-sm font-medium">
+                    <MdMood className="w-4 h-4" />
+                    {lesson.emotion}
+                  </span>
+                </div>
+
+                <div className="bg-base-100 border border-gray-200 rounded-xl p-6 mb-12 my-5">
+                  <div className="flex items-center gap-4">
+                    <div className="">
+                      <Link
+                        to={`/profile/${lesson.authorEmail}`}
+                        className="shrink-0"
+                      >
+                        <img
+                          src={
+                            lesson.authorImage ||
+                            'https://ui-avatars.com/api/?name=' +
+                              encodeURIComponent(lesson.authorName || 'User') +
+                              '&background=6366f1&color=fff'
+                          }
+                          alt={lesson.authorName}
+                          className="w-16 h-16 rounded-full object-cover border-2 border-primary/20 hover:border-primary/40 transition-colors"
+                        />
+                      </Link>
+                    </div>
+
+                    <div className="flex-1 flex justify-between items-center">
+                      <div className="">
+                        <Link
+                          to={`/profile/${lesson.authorEmail}`}
+                          className="text-lg font-semibold text-base-content hover:text-primary transition-colors block"
+                        >
+                          {lesson.authorName}
+                        </Link>
+                        <p className="text-sm text-base-content/60">
+                          {lesson.authorEmail}
+                        </p>
+                        <Link
+                          to={`/profile/${lesson.authorEmail}`}
+                          className="text-primary text-sm font-semibold hover:border-b"
+                        >
+                          View all lessons
+                        </Link>
+                      </div>
+
+                      <div className=" text-sm">
+                        <div className="flex items-center gap-2 text-base-content/70">
+                          <FaBookOpen className="w-4 h-4 text-green-500" />
+                          <span>
+                            {authorLessons.length} Total Lessons Created
                           </span>
                         </div>
-                        <p className="text-base-content">{comment.text}</p>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.div>
+                </div>
 
-        {/* Similar Lessons */}
-        {similarLessons.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-12"
-          >
-            <h2 className="text-3xl font-bold mb-8 text-center">
-              Similar Lessons
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {similarLessons.map((similarLesson) => (
-                <Link
-                  key={similarLesson._id}
-                  to={`/lesson/${similarLesson._id}`}
-                  className="bg-base-100 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                >
-                  <h3 className="font-bold text-base-content mb-2 line-clamp-2">
-                    {similarLesson.title}
+                <div className="mt-16">
+                  <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                    💬 Comments
                   </h3>
-                  <p className="text-base-content/60 text-sm line-clamp-3 mb-4">
-                    {similarLesson.description}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <span className="badge badge-primary badge-sm">
-                      {similarLesson.category}
-                    </span>
-                    <span className="badge badge-secondary badge-sm">
-                      {similarLesson.emotion}
-                    </span>
+
+                  {/* COMMENT INPUT */}
+                  {user && (
+                    <div className="mb-6 bg-white p-4 rounded-xl shadow-md">
+                      <textarea
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        className="
+          textarea textarea-bordered w-full
+          focus:outline-none focus:border-primary
+          min-h-[90px]
+        "
+                        placeholder="Write your thoughts..."
+                      />
+
+                      <div className="flex justify-end mt-3">
+                        <button
+                          onClick={() => commentMutation.mutate()}
+                          disabled={
+                            commentMutation.isPending || !comment.trim()
+                          }
+                          className="
+            btn btn-primary btn-sm
+            flex items-center gap-2
+            disabled:opacity-50
+          "
+                        >
+                          {commentMutation.isPending ? (
+                            <>
+                              <span className="loading loading-spinner loading-xs"></span>
+                              Posting...
+                            </>
+                          ) : (
+                            'Post Comment'
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* COMMENTS LIST */}
+                  <div className="space-y-2">
+                    {comments.length === 0 ? (
+                      <p className="text-sm text-gray-500 text-center">
+                        No comments yet. Be the first one!!
+                      </p>
+                    ) : (
+                      comments.map((c) => (
+                        <div
+                          key={c._id}
+                          className="bg-white p-4 rounded-xl transition shadow-md"
+                        >
+                          <div className="flex items-center gap-3 mb-1">
+                            {/* Avatar */}
+                            <div className="avatar">
+                              <div className="  w-[50px]">
+                                <img
+                                  src={c.authorImage}
+                                  alt=""
+                                  className="border-2 rounded-full border-gray-200"
+                                />
+                              </div>
+                            </div>
+
+                            <p className="font-medium text-sm">
+                              {c.authorName}
+                            </p>
+                          </div>
+
+                          <p className="text-sm text-base-content/70  pl-12">
+                            {c.text}
+                          </p>
+                        </div>
+                      ))
+                    )}
                   </div>
-                </Link>
-              ))}
+                </div>
+              </div>
             </div>
-          </motion.div>
+
+            {/* Similar Lessons Section */}
+            <div className="mt-12">
+              <h3 className="text-xl font-semibold mb-4">
+                Recommended Lessons
+              </h3>
+
+              {similarLoading && (
+                <div className="flex items-center gap-2 text-base-content/60">
+                  <span className="loading loading-spinner loading-sm"></span>
+                  <span>Loading recommendations...</span>
+                </div>
+              )}
+
+              {!similarLoading &&
+                similarLessons.length === 0 &&
+                lesson?.category &&
+                lesson?.emotion && (
+                  <div className="text-center py-8 bg-base-200 rounded-lg">
+                    <p className="text-base-content/60">
+                      No similar lessons found for{' '}
+                      <strong>{lesson.category}</strong> category or{' '}
+                      <strong>{lesson.emotion}</strong> emotion.
+                    </p>
+                    <Link
+                      to="/public_lessons"
+                      className="btn btn-primary btn-sm mt-3"
+                    >
+                      Browse All Lessons
+                    </Link>
+                  </div>
+                )}
+
+              {!similarLoading && (!lesson?.category || !lesson?.emotion) && (
+                <div className="text-center py-8 bg-base-200 rounded-lg">
+                  <p className="text-base-content/60">
+                    Cannot load recommendations - lesson category or emotion
+                    missing.
+                  </p>
+                </div>
+              )}
+
+              {similarLessons.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {similarLessons.map((l) => (
+                    <Link
+                      key={l._id}
+                      to={`/lesson/${l._id}`}
+                      className="bg-base-100 p-6 rounded-xl border border-base-300 hover:shadow-lg hover:border-primary/30 transition-all duration-300 group"
+                    >
+                      <div className="mb-4">
+                        <h4 className="font-semibold text-base-content group-hover:text-primary transition-colors mb-2 line-clamp-2">
+                          {l.title}
+                        </h4>
+                        <p className="text-sm text-base-content/60 line-clamp-3">
+                          {l.description}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-base-content/50">
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center gap-1">
+                            <FaEye className="w-3 h-3" />
+                            {l.views || 0}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <FaHeart className="w-3 h-3" />
+                            {l.likesCount || 0}
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          <span className="badge badge-primary badge-xs">
+                            {l.category}
+                          </span>
+                          <span className="badge badge-secondary badge-xs">
+                            {l.emotion}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
         )}
 
-        {/* Report Modal */}
-        {showReportModal && (
-          <div className="modal modal-open">
-            <div className="modal-box">
-              <h3 className="font-bold text-lg mb-4">Report Lesson</h3>
-              <div className="space-y-3">
-                {[
-                  'Inappropriate Content',
-                  'Hate Speech or Harassment',
-                  'Misleading or False Information',
-                  'Spam or Promotional Content',
-                  'Sensitive or Disturbing Content',
-                  'Other',
-                ].map((reason) => (
-                  <label key={reason} className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="reportReason"
-                      value={reason}
-                      checked={reportReason === reason}
-                      onChange={(e) => setReportReason(e.target.value)}
-                      className="radio radio-primary"
-                    />
-                    <span>{reason}</span>
-                  </label>
-                ))}
-              </div>
-              <div className="modal-action">
-                <button
-                  onClick={handleReport}
-                  disabled={!reportReason || reportMutation.isPending}
-                  className="btn btn-error"
+        <AnimatePresence>
+          {showShare && (
+            <motion.div
+              className="fixed inset-0 bg-black/40 flex items-center justify-center"
+              onClick={() => setShowShare(false)}
+            >
+              <motion.div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white p-6 rounded-xl w-80"
+              >
+                <div className="flex justify-between mb-4">
+                  <h4 className="font-semibold">Share</h4>
+                  <button onClick={() => setShowShare(false)}>
+                    <FaTimes />
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <FacebookShareButton url={window.location.href}>
+                    <FacebookIcon round size={32} />
+                  </FacebookShareButton>
+                  <TwitterShareButton url={window.location.href}>
+                    <TwitterIcon round size={32} />
+                  </TwitterShareButton>
+                  <LinkedinShareButton url={window.location.href}>
+                    <LinkedinIcon round size={32} />
+                  </LinkedinShareButton>
+                  <WhatsappShareButton url={window.location.href}>
+                    <WhatsappIcon round size={32} />
+                  </WhatsappShareButton>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {showReport && (
+            <motion.div
+              className="fixed inset-0 bg-black/40 flex items-center justify-center"
+              onClick={() => setShowReport(false)}
+            >
+              <motion.div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white p-6 rounded-xl w-96"
+              >
+                <h4 className="font-semibold mb-4">Report Lesson</h4>
+                <select
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  className="select select-bordered w-full mb-4"
                 >
-                  Submit Report
-                </button>
+                  <option value="">Select reason</option>
+                  <option>Inappropriate Content</option>
+                  <option>Hate Speech or Harassment</option>
+                  <option>Misleading or False Information</option>
+                  <option>Spam or Promotional Content</option>
+                  <option>Sensitive or Disturbing Content</option>
+                  <option>Other</option>
+                </select>
                 <button
-                  onClick={() => setShowReportModal(false)}
-                  className="btn"
+                  onClick={() => reportMutation.mutate()}
+                  disabled={reportMutation.isPending || !reportReason}
+                  className="btn btn-error w-full"
                 >
-                  Cancel
+                  {reportMutation.isPending ? (
+                    <>
+                      <span className="loading loading-spinner loading-xs"></span>
+                      Submitting...
+                    </>
+                  ) : (
+                    'Submit Report'
+                  )}
                 </button>
-              </div>
-            </div>
-          </div>
-        )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

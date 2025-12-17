@@ -1,14 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router';
-import { FaLock, FaCrown, FaCalendarAlt, FaEye, FaHeart, FaBookOpen } from 'react-icons/fa';
-import useAuth from '../../hooks/useAuth';
+import {
+  FaLock,
+  FaCrown,
+  FaCalendarAlt,
+  FaEye,
+  FaHeart,
+  FaBookOpen,
+} from 'react-icons/fa';
 
-const LessonCard = ({ lesson }) => {
-  const { user } = useAuth();
+const LessonCard = ({ lesson, currentUser }) => {
   const isPremiumLesson = lesson.accessLevel === 'Premium';
   const canViewPremium =
-    user?.isPremium || lesson.authorEmail === user?.email;
+    currentUser?.isPremium || lesson.authorEmail === currentUser?.email;
   const isBlurred = isPremiumLesson && !canViewPremium;
 
   return (
@@ -36,8 +41,8 @@ const LessonCard = ({ lesson }) => {
       )}
 
       {/* Lesson Image */}
-      {lesson.image && (
-        <div className="h-[300px] overflow-hidden">
+      {lesson.image ? (
+        <div className="h-[200px] overflow-hidden">
           <img
             src={lesson.image}
             alt={lesson.title}
@@ -45,6 +50,10 @@ const LessonCard = ({ lesson }) => {
               isBlurred ? 'blur-sm' : ''
             }`}
           />
+        </div>
+      ) : (
+        <div className="bg-linear-to-br from-orange-500/20 via-red-500/20 to-pink-500/20 flex items-center justify-center h-[200px]">
+          <FaBookOpen className="w-16 h-16 text-base-content/30" />
         </div>
       )}
 
@@ -95,7 +104,7 @@ const LessonCard = ({ lesson }) => {
             />
           </Link>
           <div className="flex-1">
-            <Link 
+            <Link
               to={`/profile/${lesson.authorEmail}`}
               className="text-sm font-medium text-base-content hover:text-primary transition-colors"
             >
@@ -107,8 +116,6 @@ const LessonCard = ({ lesson }) => {
             </p>
           </div>
         </div>
-
-        
 
         {/* Action Button */}
         <div className="">

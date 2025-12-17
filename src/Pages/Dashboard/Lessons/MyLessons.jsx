@@ -18,8 +18,8 @@ const MyLessons = () => {
     queryKey: ['myLessons', user?.email],
     enabled: !!user?.email,
     queryFn: async () => {
-      const res = await axios.get(`/lessons?email=${user?.email}`);
-      return res.data;
+      const res = await axios.get(`/lessons/user/${user?.email}`);
+      return res?.data;
     },
   });
 

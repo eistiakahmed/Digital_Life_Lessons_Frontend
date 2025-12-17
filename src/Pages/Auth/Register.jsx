@@ -18,6 +18,7 @@ import {
   FaRocket,
 } from 'react-icons/fa';
 import useAxios from '../../hooks/useAxios';
+import { syncUserWithBackend } from '../../utils/userSync';
 
 const Register = () => {
   const [textToggling, setTextToggling] = useState(false);
@@ -42,18 +43,22 @@ const Register = () => {
           displayName: data.name,
           photoURL: data.image,
         }).then(async () => {
-          const userInfo = {
-            name: data.name,
-            email: data.email,
-            image: data.image,
-            isPremium: false,
-            role: 'user',
-          };
+          try {
+            // Create updated user object with the profile data
+            const updatedUser = {
+              ...user,
+              displayName: data.name,
+              photoURL: data.image,
+            };
 
-          await axios.post('/user', userInfo);
-
-          toast.success('Account created successfully!');
-          navigate(location?.state || '/');
+            await syncUserWithBackend(updatedUser);
+            toast.success('Account created successfully!');
+            navigate(location?.state || '/');
+          } catch (error) {
+            console.error('Error syncing user:', error);
+            toast.success('Account created successfully!');
+            navigate(location?.state || '/');
+          }
         });
       })
       .catch((error) => {
@@ -61,26 +66,29 @@ const Register = () => {
       });
   };
 
-  const handleGoogleLogin = () => {
-    signInGoogle()
-      .then(async (result) => {
-        const user = result.user;
-        console.log(user.email)
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInGoogle();
+      const user = result.user;
 
-        const userInfo = {
-          name: user?.displayName,
-          email: user?.email,
-          image: user?.photoURL,
-          isPremium: false,
-          role: 'user',
-        };
+      console.log('Google registration successful:', user);
 
-        await axios.post('/user', userInfo);
+      
+      setTimeout(async () => {
+        try {
+          await syncUserWithBackend(user);
+          console.log('User synced successfully');
+        } catch (error) {
+          console.error('Error syncing user:', error);
+        }
+      }, 1000);
 
-        toast.success('Account created with Google');
-        navigate(location?.state || '/');
-      })
-      .catch((err) => toast.error(err.message));
+      toast.success('Account created with Google');
+      navigate(location?.state || '/');
+    } catch (err) {
+      console.error('Google registration error:', err);
+      toast.error(err.message);
+    }
   };
 
   return (

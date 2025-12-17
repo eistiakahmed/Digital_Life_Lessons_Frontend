@@ -16,7 +16,6 @@ import { Link } from 'react-router';
 
 const PublicProfile = () => {
   const { email } = useParams();
-  console.log(email)
   const axios = useAxios();
 
   // Fetch user profile data  
@@ -28,6 +27,8 @@ const PublicProfile = () => {
     },
     enabled: !!email,
   });
+
+  // console.log(profileUser?.photoURL)
 
   // Fetch user's public lessons
   const { data: userLessons = [], isLoading: lessonsLoading } = useQuery({
@@ -93,10 +94,7 @@ const PublicProfile = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <Link 
-            to="/" 
-            className="btn btn-ghost gap-2 mb-4"
-          >
+          <Link to="/" className="btn btn-ghost gap-2 mb-4">
             <FaArrowLeft className="w-4 h-4" />
             Back to Home
           </Link>
@@ -113,12 +111,13 @@ const PublicProfile = () => {
             <div className="relative">
               <img
                 src={
-                  profileUser.photoURL ||
+                  profileUser?.photoURL ||
+                  profileUser?.image ||
                   'https://ui-avatars.com/api/?name=' +
                     encodeURIComponent(profileUser.displayName || 'User') +
                     '&background=6366f1&color=fff'
                 }
-                alt={profileUser?.displayName}
+                alt={profileUser?.name || profileUser.displayName}
                 className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
               />
               {profileUser.isPremium && (
@@ -130,7 +129,9 @@ const PublicProfile = () => {
 
             <div className="flex-1 text-center md:text-left">
               <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
-                <h1 className="text-3xl font-bold">{profileUser.displayName}</h1>
+                <h1 className="text-3xl font-bold">
+                  {profileUser?.name || profileUser.displayName}
+                </h1>
                 {profileUser.isPremium && (
                   <span className="badge badge-warning gap-1">
                     <FaCrown className="w-3 h-3" />
@@ -149,7 +150,6 @@ const PublicProfile = () => {
           </div>
         </motion.div>
 
-        
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -185,7 +185,7 @@ const PublicProfile = () => {
         >
           <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
             <FaBookOpen className="w-6 h-6 text-primary" />
-            Public Lessons by {profileUser.name}
+            Public Lessons by {profileUser.displayName}
           </h2>
 
           {lessonsLoading ? (

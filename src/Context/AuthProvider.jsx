@@ -63,26 +63,31 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unSubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        
         await currentUser.reload();
         const refreshedUser = auth.currentUser;
 
-        
         const providerEmail = refreshedUser?.providerData?.[0]?.email;
 
         if (!refreshedUser.email && providerEmail) {
           console.warn('Email was null, using providerData email');
         }
 
-        setUser({
+        const finalUser = {
           ...refreshedUser,
           email: refreshedUser.email || providerEmail,
-        });
+        };
+
+        setUser(finalUser);
 
         // MongoDB fetch
-        const finalEmail = refreshedUser.email || providerEmail;
+        const finalEmail = finalUser.email;
         if (finalEmail) {
-          fetchUserData(finalEmail);
+          try {
+            await fetchUserData(finalEmail);
+          } catch (error) {
+            console.log('User not found in database, will be created on next sync');
+            setUserDB(null);
+          }
         }
       } else {
         setUser(null);

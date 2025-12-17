@@ -14,6 +14,7 @@ import {
 import useAxios from '../../hooks/useAxios';
 import { useState } from 'react';
 import { IoIosEye, IoIosEyeOff } from 'react-icons/io';
+import { syncUserWithBackend } from '../../utils/userSync';
 
 const Login = () => {
   const { signInUser, signInGoogle } = useAuth();
@@ -40,25 +41,29 @@ const Login = () => {
       });
   };
 
-  const handleGoogleLogin = () => {
-    signInGoogle()
-      .then(async (result) => {
-        const user = result.user;
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInGoogle();
+      const user = result.user;
 
-        const userInfo = {
-          name: user.displayName,
-          email: user.email,
-          image: user.photoURL,
-          isPremium: false,
-          role: 'user',
-        };
+      console.log('Google login successful:', user);
 
-        await axios.post('/user', userInfo);
+      // Wait a moment for Firebase to fully process the user
+      setTimeout(async () => {
+        try {
+          await syncUserWithBackend(user);
+          console.log('User synced successfully');
+        } catch (error) {
+          console.error('Error syncing user:', error);
+        }
+      }, 1000);
 
-        toast.success('Logged in with Google');
-        navigate(location?.state || '/');
-      })
-      .catch((err) => toast.error(err.message));
+      toast.success('Logged in with Google');
+      navigate(location?.state || '/');
+    } catch (err) {
+      console.error('Google login error:', err);
+      toast.error(err.message);
+    }
   };
 
   return (

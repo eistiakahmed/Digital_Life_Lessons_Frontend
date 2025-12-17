@@ -86,7 +86,7 @@ const UpdateLesson = () => {
       // Check if user owns this lesson
       if (lesson.authorEmail !== user?.email) {
         toast.error('You can only edit your own lessons');
-        navigate('/dashboard/my-lessons');
+        navigate('/dashboard/my_lessons');
         return;
       }
 
@@ -140,7 +140,7 @@ const UpdateLesson = () => {
   };
 
   const handleCancel = () => {
-    navigate('/dashboard/my-lessons');
+    navigate('/dashboard/my_lessons');
   };
 
   if (isLoading) {

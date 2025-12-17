@@ -7,8 +7,9 @@ import toast from 'react-hot-toast';
 
 const Navbar = () => {
   const { user, userDB, LogoutUser } = useAuth();
+  
 
-  console.log(user)
+  // console.log(user)
   
   
   const isAdmin = userDB?.role === 'admin';

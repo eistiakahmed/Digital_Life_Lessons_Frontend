@@ -11,7 +11,6 @@ import {
   FaCrown,
   FaCalendarAlt,
   FaChartLine,
-  
 } from 'react-icons/fa';
 
 const DashboardHome = () => {
@@ -52,7 +51,10 @@ const DashboardHome = () => {
   });
 
   // Calculate stats
-  const totalViews = userLessons.reduce((sum, lesson) => sum + (lesson.views || 0), 0);
+  const totalViews = userLessons.reduce(
+    (sum, lesson) => sum + (lesson.views || 0),
+    0
+  );
   const totalLikes = userLessons.reduce(
     (sum, lesson) => sum + (lesson.likesCount || 0),
     0
@@ -65,7 +67,7 @@ const DashboardHome = () => {
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
   const thisWeekLessons = userLessons.filter(
-    lesson => new Date(lesson.createdAt) >= oneWeekAgo
+    (lesson) => new Date(lesson.createdAt) >= oneWeekAgo
   );
 
   const stats = [
@@ -293,7 +295,6 @@ const DashboardHome = () => {
           )}
         </motion.div>
 
-        {/* Weekly Analytics */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}

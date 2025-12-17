@@ -9,14 +9,25 @@ const queryClient = new QueryClient();
 import ThemeProvider from './Context/ThemeProvider';
 import AuthProvider from './Context/AuthProvider';
 import { Toaster } from 'react-hot-toast';
+import useUserSync from './hooks/useUserSync';
+
+// Component to handle user sync
+const AppWithSync = () => {
+  useUserSync();
+  return (
+    <>
+      <RouterProvider router={router} />
+      <Toaster />
+    </>
+  );
+};
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <RouterProvider router={router} />
-          <Toaster />
+          <AppWithSync />
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

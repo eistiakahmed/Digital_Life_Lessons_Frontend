@@ -112,7 +112,7 @@ const PublicLessons = () => {
 
   return (
     <div className="min-h-screen bg-base-200 py-8">
-      <div className=''>
+      <div className="">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -212,9 +212,13 @@ const PublicLessons = () => {
             </p>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             {paginatedLessons.map((lesson) => (
-              <LessonCard key={lesson._id} lesson={lesson} />
+              <LessonCard
+                key={lesson._id}
+                lesson={lesson}
+                currentUser={currentUser}
+              />
             ))}
           </div>
         )}
