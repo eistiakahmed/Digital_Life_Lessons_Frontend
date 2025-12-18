@@ -4,7 +4,7 @@
 
 Digital Life Lessons is a modern platform for preserving and sharing real-life insights. Whether it’s personal growth, career lessons, relationship wisdom, or health breakthroughs, this platform ensures valuable experiences aren’t lost and helps others learn from them.
 
-🌐 **Live Site:** [{https://digital-life-lessons.netlify.app/)(https://digital-life-lessons.netlify.app/)]
+🌐 **Live Site:** [(https://digital-life-lessons.netlify.app/)]
 
 ---
 
