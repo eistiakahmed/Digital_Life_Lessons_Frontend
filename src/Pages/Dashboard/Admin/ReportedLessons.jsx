@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router';
 import useAxios from '../../../hooks/useAxios';
 import toast from 'react-hot-toast';
-import Swal from 'sweetalert2';
 import {
   FaFlag,
   FaTrash,
@@ -13,14 +13,15 @@ import {
   FaSearch,
   FaFilter,
 } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 
 /* ---------- Stat Card ---------- */
-const StatCard = ({ icon, label, value, color }) => (
-  <div className="p-4 border rounded-xl flex items-center gap-4 shadow hover:shadow-lg transition ">
-    <div className={`text-3xl ${color}`}>{icon}</div>
+const StatCard = ({ icon, label, value }) => (
+  <div className="p-4 border rounded-xl flex items-center gap-4">
+    <div className="text-xl">{icon}</div>
     <div>
       <p className="text-2xl font-bold">{value}</p>
-      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-sm text-base-content/60">{label}</p>
     </div>
   </div>
 );
@@ -57,14 +58,12 @@ const ReportedLessons = () => {
   const resolveReport = async (reportId, action) => {
     const result = await Swal.fire({
       title: 'Resolve Report?',
-      text: `Are you sure you want to ${
-        action === 'dismiss' ? 'dismiss' : 'resolve'
-      } this report?`,
+      text: `Are you sure you want to ${action === 'dismiss' ? 'dismiss' : 'resolve'} this report?`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, resolve it!',
+      confirmButtonText: 'Yes, resolve it!'
     });
 
     if (!result.isConfirmed) return;
@@ -91,7 +90,7 @@ const ReportedLessons = () => {
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel',
+      cancelButtonText: 'Cancel'
     });
 
     if (!result.isConfirmed) return;
@@ -109,6 +108,7 @@ const ReportedLessons = () => {
     }
   };
 
+  // Process data
   const allReports = reportedLessons.flatMap((item) =>
     Array.isArray(item.reports)
       ? item.reports.map((report) => ({
@@ -136,10 +136,10 @@ const ReportedLessons = () => {
     return matchesSearch && matchesReason && matchesStatus;
   });
 
-  const uniqueReasons = [...new Set(allReports.map((r) => r.reason))].filter(
-    Boolean
-  );
+  // Get unique reasons for filter dropdown
+  const uniqueReasons = [...new Set(allReports.map(r => r.reason))].filter(Boolean);
 
+  // Calculate stats
   const totalReports = allReports.length;
   const pendingReports = allReports.filter((r) => !r.resolved).length;
   const resolvedReports = allReports.filter((r) => r.resolved).length;
@@ -147,53 +147,49 @@ const ReportedLessons = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
+      <div className="flex justify-center items-center min-h-96">
         <div className="loading loading-spinner loading-lg"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 p-4 md:p-8">
-      <h1 className="text-4xl font-bold text-center mb-6">Reported Lessons</h1>
+    <div className="space-y-8">
+      <h1 className="text-4xl font-bold text-center">Reported Lessons</h1>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard
-          icon={<FaFlag />}
+          icon={<FaFlag color='blue'/>}
           label="Total Reports"
           value={totalReports}
-          color="text-blue-500"
         />
         <StatCard
-          icon={<FaExclamationTriangle />}
+          icon={<FaExclamationTriangle color='orange'/>}
           label="Pending"
           value={pendingReports}
-          color="text-orange-400"
         />
+        <StatCard icon={<FaCheck color='green'/>} label="Resolved" value={resolvedReports} />
         <StatCard
-          icon={<FaCheck color="text-green-500" />}
-          label="Resolved"
-          value={resolvedReports}
-        />
-        <StatCard
-          icon={<FaBookOpen color="text-purple-500" />}
+          icon={<FaBookOpen color='purple'/>}
           label="Unique Lessons"
           value={uniqueLessons}
         />
       </div>
 
-      {/* Filters */}
-      <div className=" rounded-xl shadow-md p-4 mb-4">
-        <div className="flex flex-col md:flex-row gap-4">
+      {/* Filters Section */}
+      <div className="bg-base-100 rounded-xl border p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search */}
-          <div className="flex-1">
-            <label className="label flex items-center gap-2 mb-1">
-              <FaSearch /> <span>Search</span>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text flex items-center gap-2">
+                <FaSearch /> Search
+              </span>
             </label>
             <input
               type="text"
-              placeholder="Search by lesson, reason, or reporter..."
+              placeholder="Search by lesson title, reason, or reporter..."
               className="input input-bordered w-full"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -201,9 +197,11 @@ const ReportedLessons = () => {
           </div>
 
           {/* Filter by Reason */}
-          <div className="flex-1">
-            <label className="label flex items-center gap-2 mb-1">
-              <FaFilter /> <span>Filter by Reason</span>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text flex items-center gap-2">
+                <FaFilter /> Filter by Reason
+              </span>
             </label>
             <select
               className="select select-bordered w-full"
@@ -220,9 +218,11 @@ const ReportedLessons = () => {
           </div>
 
           {/* Filter by Status */}
-          <div className="flex-1">
-            <label className="label flex items-center gap-2 mb-1">
-              <FaFilter /> <span>Filter by Status</span>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text flex items-center gap-2">
+                <FaFilter /> Filter by Status
+              </span>
             </label>
             <select
               className="select select-bordered w-full"
@@ -237,13 +237,33 @@ const ReportedLessons = () => {
         </div>
       </div>
 
+      {/* Results Summary */}
+      <div className="flex justify-between items-center">
+        <p className="text-sm text-base-content/60">
+          Showing {filteredReports.length} of {totalReports} reports
+        </p>
+        {(searchTerm || filterReason !== 'All' || filterStatus !== 'All') && (
+          <button
+            onClick={() => {
+              setSearchTerm('');
+              setFilterReason('All');
+              setFilterStatus('All');
+            }}
+            className="btn btn-sm btn-ghost"
+          >
+            Clear Filters
+          </button>
+        )}
+      </div>
+
       {/* Reports Table */}
-      <div className="overflow-x-auto rounded-xl shadow-md">
-        <table className="table w-full min-w-[700px]">
-          <thead className=" bg-gray-200">
+      <div className="overflow-x-auto bg-base-100 rounded-xl border">
+        <table className="table">
+          <thead>
             <tr>
-              <th>SN</th>
+              <th>Serial No</th>
               <th>Lesson Title</th>
+              <th>Reporter</th>
               <th>Reason</th>
               <th>Status</th>
               <th>Date</th>
@@ -252,51 +272,63 @@ const ReportedLessons = () => {
           </thead>
           <tbody>
             {filteredReports.map((report, index) => (
-              <tr key={report._id} className="">
+              <tr key={report._id}>
                 <td>{index + 1}</td>
-                <td>{report.lessonTitle}</td>
-                <td>{report.reason}</td>
                 <td>
-                  <span
-                    className={`px-2 py-1 rounded-full text-white text-xs ${
-                      report.resolved ? 'bg-green-500' : 'bg-yellow-500'
-                    }`}
-                  >
+                  <div className="font-medium">
+                    {report.lessonTitle || 'Unknown Lesson'}
+                  </div>
+                </td>
+                <td>
+                  <div className="text-sm text-base-content/70">
+                    {report.reporterEmail || 'Anonymous'}
+                  </div>
+                </td>
+                <td>
+                  <span className="badge badge-outline">
+                    {report.reason}
+                  </span>
+                </td>
+                <td>
+                  <span className={`badge ${report.resolved ? 'badge-success' : 'badge-warning'}`}>
                     {report.resolved ? 'Resolved' : 'Pending'}
                   </span>
                 </td>
                 <td>{new Date(report.createdAt).toLocaleDateString()}</td>
-                <td className="flex gap-2">
-                  {report.lessonId && (
-                    <Link
-                      to={`/lesson/${report.lessonId}`}
-                      className="btn btn-xs btn-info hover:bg-blue-600"
-                    >
-                      <FaEye />
-                    </Link>
-                  )}
-
-                  {!report.resolved && (
-                    <>
-                      <button
-                        disabled={isProcessing}
-                        onClick={() => resolveReport(report._id, 'dismiss')}
-                        className="btn btn-xs btn-success hover:bg-green-600"
+                <td>
+                  <div className="flex gap-2">
+                    {report.lessonId && (
+                      <Link
+                        to={`/lesson/${report.lessonId}`}
+                        className="btn btn-xs btn-info"
+                        title="View Lesson"
                       >
-                        <FaCheck />
-                      </button>
+                        <FaEye />
+                      </Link>
+                    )}
 
-                      <button
-                        disabled={isProcessing}
-                        onClick={() =>
-                          deleteLesson(report.lessonId, report.lessonTitle)
-                        }
-                        className="btn btn-xs btn-error hover:bg-red-600"
-                      >
-                        <FaTrash />
-                      </button>
-                    </>
-                  )}
+                    {!report.resolved && (
+                      <>
+                        <button
+                          disabled={isProcessing}
+                          onClick={() => resolveReport(report._id, 'dismiss')}
+                          className="btn btn-xs btn-success"
+                          title="Dismiss Report"
+                        >
+                          <FaCheck />
+                        </button>
+
+                        <button
+                          disabled={isProcessing}
+                          onClick={() => deleteLesson(report.lessonId, report.lessonTitle)}
+                          className="btn btn-xs btn-error"
+                          title="Delete Lesson"
+                        >
+                          <FaTrash />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
@@ -304,7 +336,12 @@ const ReportedLessons = () => {
         </table>
 
         {filteredReports.length === 0 && (
-          <p className="text-center py-10 text-gray-500">No reports found</p>
+          <div className="text-center py-10">
+            <FaFlag className="w-16 h-16 mx-auto text-base-content/20 mb-4" />
+            <p className="text-base-content/60">
+              {totalReports === 0 ? 'No reports found' : 'No reports match your filters'}
+            </p>
+          </div>
         )}
       </div>
     </div>

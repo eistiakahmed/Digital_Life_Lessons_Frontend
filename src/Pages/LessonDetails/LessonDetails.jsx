@@ -186,6 +186,7 @@ const LessonDetails = () => {
       }
       return axios.post('/lessons/report', {
         lessonId: lesson._id,
+        reportLessonTitle: lesson?.title,
         reporterUserId: user?.uid,
         reporterEmail: user?.email,
         reason: reportReason,

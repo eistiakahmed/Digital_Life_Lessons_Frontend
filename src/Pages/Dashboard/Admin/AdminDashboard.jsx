@@ -1,360 +1,163 @@
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router';
-
-import useAxios from '../../../hooks/useAxios';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import {
   FaUsers,
   FaBookOpen,
   FaFlag,
   FaChartLine,
-  FaCrown,
-  FaEye,
-  FaHeart,
+  FaFire,
 } from 'react-icons/fa';
+import useAxios from '../../../hooks/useAxios';
 
 const AdminDashboard = () => {
   const axios = useAxios();
 
-  // Fetch all users
-  const { data: allUsers = [] } = useQuery({
-    queryKey: ['allUsers'],
-    queryFn: async () => {
-      const res = await axios.get('/users');
-      return res.data;
-    },
+  const { data: users = [] } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: async () => (await axios.get('/users')).data,
   });
 
-  // Fetch all lessons
-  const { data: allLessons = [] } = useQuery({
-    queryKey: ['allLessons'],
-    queryFn: async () => {
-      const res = await axios.get('/admin/lessons');
-      return res.data;
-    },
+  const { data: lessons = [] } = useQuery({
+    queryKey: ['admin-lessons'],
+    queryFn: async () => (await axios.get('/admin/lessons')).data,
   });
 
-  // Fetch reported lessons
-  const { data: reportedLessons = [] } = useQuery({
-    queryKey: ['reportedLessons'],
-    queryFn: async () => {
-      const res = await axios.get('/admin/reported-lessons');
-      return res.data;
-    },
+  const { data: reports = [] } = useQuery({
+    queryKey: ['admin-reports'],
+    queryFn: async () => (await axios.get('/admin/reported-lessons')).data,
   });
-
-  // Calculate stats
-  const totalUsers = allUsers.length;
-  const premiumUsers = allUsers.filter((user) => user.isPremium).length;
-  const totalPublicLessons = allLessons.filter(
-    (lesson) => lesson.privacy === 'Public'
-  ).length;
-  const totalPrivateLessons = allLessons.filter(
-    (lesson) => lesson.privacy === 'Private'
-  ).length;
-  const totalReports = reportedLessons.length;
-
-  
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const todayLessons = allLessons.filter(
-    (lesson) => new Date(lesson.createdAt) >= today
-  ).length;
-
-  
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  const weeklyUsers = allUsers.filter(
-    (user) => new Date(user.createdAt) >= oneWeekAgo
-  ).length;
 
   const stats = [
     {
       title: 'Total Users',
-      value: totalUsers,
-      icon: <FaUsers className="w-8 h-8" />,
-      color: 'from-blue-500 to-cyan-500',
-      bgColor: 'bg-blue-500/10',
-      change: `+${weeklyUsers} this week`,
-    },
-    {
-      title: 'Premium Users',
-      value: premiumUsers,
-      icon: <FaCrown className="w-8 h-8" />,
-      color: 'from-yellow-500 to-orange-500',
-      bgColor: 'bg-yellow-500/10',
-      change: `${Math.round((premiumUsers / totalUsers) * 100)}% conversion`,
+      value: users.length,
+      icon: <FaUsers />,
+      gradient: 'from-indigo-500 to-indigo-700',
     },
     {
       title: 'Public Lessons',
-      value: totalPublicLessons,
-      icon: <FaBookOpen className="w-8 h-8" />,
-      color: 'from-green-500 to-emerald-500',
-      bgColor: 'bg-green-500/10',
-      change: `+${todayLessons} today`,
+      value: lessons.filter((l) => l.privacy === 'Public').length,
+      icon: <FaBookOpen />,
+      gradient: 'from-emerald-500 to-emerald-700',
     },
     {
-      title: 'Reported Content',
-      value: totalReports,
-      icon: <FaFlag className="w-8 h-8" />,
-      color: 'from-red-500 to-pink-500',
-      bgColor: 'bg-red-500/10',
-      change: 'Needs attention',
+      title: 'Reported Lessons',
+      value: reports.length,
+      icon: <FaFlag />,
+      gradient: 'from-rose-500 to-rose-700',
+    },
+    {
+      title: "Today's Lessons",
+      value: lessons.filter(
+        (l) =>
+          new Date(l.createdAt).toDateString() === new Date().toDateString()
+      ).length,
+      icon: <FaFire />,
+      gradient: 'from-amber-500 to-amber-700',
     },
   ];
 
-  const quickActions = [
-    {
-      title: 'Manage Users',
-      description: 'View and manage all registered users',
-      icon: <FaUsers className="w-6 h-6" />,
-      link: '/dashboard/admin/manage-users',
-      color: 'btn-primary',
-    },
-    {
-      title: 'Manage Lessons',
-      description: 'Moderate and feature lessons',
-      icon: <FaBookOpen className="w-6 h-6" />,
-      link: '/dashboard/admin/manage-lessons',
-      color: 'btn-secondary',
-    },
-    {
-      title: 'Review Reports',
-      description: 'Handle reported content',
-      icon: <FaFlag className="w-6 h-6" />,
-      link: '/dashboard/admin/reported-lessons',
-      color: 'btn-warning',
-    },
-  ];
+  const weeklyGrowth = [...Array(7)].map((_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (6 - i));
+    const next = new Date(date);
+    next.setDate(next.getDate() + 1);
 
-  // Recent activity (last 10 lessons)
-  const recentLessons = allLessons
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 10);
+    return {
+      day: date.toLocaleDateString('en-US', { weekday: 'short' }),
+      users: users.filter(
+        (u) => new Date(u.createdAt) >= date && new Date(u.createdAt) < next
+      ).length,
+      lessons: lessons.filter(
+        (l) => new Date(l.createdAt) >= date && new Date(l.createdAt) < next
+      ).length,
+    };
+  });
+
+  const contributors = Object.values(
+    lessons.reduce((acc, lesson) => {
+      acc[lesson.authorEmail] ||= {
+        name: lesson.authorName,
+        lessons: 0,
+      };
+      acc[lesson.authorEmail].lessons++;
+      return acc;
+    }, {})
+  )
+    .sort((a, b) => b.lessons - a.lessons)
+    .slice(0, 5);
 
   return (
-    <div className="space-y-8">
-      {/* Admin Header */}
+    <div className="space-y-10">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="bg-linear-to-r from-red-500 via-purple-500 to-blue-500 p-8 rounded-3xl text-white"
+        className="rounded-3xl bg-gradient-to-r from-primary to-secondary p-8 text-primary-content shadow-lg"
       >
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Admin Dashboard 👑</h1>
-            <p className="text-white/80">
-              Platform overview and management controls
-            </p>
-          </div>
-          <div className="hidden md:block">
-            <div className="text-right">
-              <p className="text-2xl font-bold">{totalUsers}</p>
-              <p className="text-white/80">Total Users</p>
-            </div>
-          </div>
-        </div>
+        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <p className="opacity-80">System overview & analytics</p>
       </motion.div>
 
-      {/* Stats Cards */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-      >
-        {stats.map((stat, index) => (
-          <div
-            key={index}
-            className={`${stat.bgColor} p-6 rounded-2xl border border-base-300`}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((s, i) => (
+          <motion.div
+            key={i}
+            whileHover={{ scale: 1.03 }}
+            className={`rounded-2xl bg-gradient-to-r ${s.gradient} p-6 text-white shadow-lg`}
           >
-            <div className="flex items-center justify-between mb-4">
-              <div
-                className={`p-3 rounded-full bg-linear-to-r ${stat.color} text-white`}
-              >
-                {stat.icon}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm opacity-80">{s.title}</p>
+                <p className="text-3xl font-bold">{s.value}</p>
               </div>
+              <div className="text-4xl opacity-80">{s.icon}</div>
             </div>
-            <div>
-              <p className="text-3xl font-bold text-base-content mb-1">
-                {stat.value}
-              </p>
-              <p className="text-base-content/60 text-sm font-medium mb-2">
-                {stat.title}
-              </p>
-              <p className="text-xs text-base-content/50">{stat.change}</p>
-            </div>
-          </div>
+          </motion.div>
         ))}
-      </motion.div>
+      </div>
 
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-        className="bg-base-100 p-8 rounded-3xl shadow-lg border border-base-300"
-      >
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-          <FaChartLine className="w-6 h-6 text-primary" />
-          Admin Actions
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {quickActions.map((action, index) => (
-            <Link
-              key={index}
-              to={action.link}
-              className="block p-6 bg-base-200 rounded-2xl hover:shadow-lg transition-all duration-300 hover:scale-105"
-            >
-              <div className="flex items-center gap-4 mb-3">
-                <div className={`btn ${action.color} btn-sm`}>
-                  {action.icon}
-                </div>
-                <h3 className="font-bold text-base-content">{action.title}</h3>
-              </div>
-              <p className="text-base-content/60 text-sm">
-                {action.description}
-              </p>
-            </Link>
-          ))}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl border bg-base-100 p-6 shadow">
+          <h3 className="mb-4 flex items-center gap-2 text-lg font-bold">
+            <FaChartLine /> Weekly Growth
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={weeklyGrowth}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line dataKey="users" stroke="#22c55e" strokeWidth={3} />
+              <Line dataKey="lessons" stroke="#6366f1" strokeWidth={3} />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
-      </motion.div>
 
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Lessons */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="bg-base-100 p-8 rounded-3xl shadow-lg border border-base-300"
-        >
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-            <FaBookOpen className="w-6 h-6 text-primary" />
-            Recent Lessons
-          </h2>
-          <div className="space-y-4 max-h-96 overflow-y-auto">
-            {recentLessons.map((lesson) => (
-              <div
-                key={lesson._id}
-                className="flex items-center gap-4 p-4 bg-base-200 rounded-xl"
-              >
-                <div className="flex-1">
-                  <h3 className="font-medium text-base-content line-clamp-1">
-                    {lesson.title}
-                  </h3>
-                  <p className="text-sm text-base-content/60">
-                    by {lesson.authorName}
-                  </p>
-                  <div className="flex items-center gap-4 mt-2">
-                    <span
-                      className={`badge ${
-                        lesson.privacy === 'Public'
-                          ? 'badge-success'
-                          : 'badge-warning'
-                      } badge-sm`}
-                    >
-                      {lesson.privacy}
-                    </span>
-                    <span
-                      className={`badge ${
-                        lesson.accessLevel === 'Free'
-                          ? 'badge-info'
-                          : 'badge-error'
-                      } badge-sm`}
-                    >
-                      {lesson.accessLevel}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-3 text-sm text-base-content/60">
-                    <span className="flex items-center gap-1">
-                      <FaEye className="w-3 h-3" />
-                      {lesson.views || 0}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FaHeart className="w-3 h-3" />
-                      {lesson.likesCount || 0}
-                    </span>
-                  </div>
-                  <p className="text-xs text-base-content/50 mt-1">
-                    {new Date(lesson.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Platform Analytics */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="bg-base-100 p-8 rounded-3xl shadow-lg border border-base-300"
-        >
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-            <FaChartLine className="w-6 h-6 text-primary" />
-            Platform Analytics
-          </h2>
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <span className="text-base-content/70">Total Content</span>
-              <span className="text-2xl font-bold text-primary">
-                {allLessons.length}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-base-content/70">Public vs Private</span>
-              <div className="text-right">
-                <span className="text-lg font-bold text-success">
-                  {totalPublicLessons}
-                </span>
-                <span className="text-base-content/50"> / </span>
-                <span className="text-lg font-bold text-warning">
-                  {totalPrivateLessons}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-base-content/70">Premium Conversion</span>
-              <span className="text-2xl font-bold text-yellow-500">
-                {totalUsers > 0
-                  ? Math.round((premiumUsers / totalUsers) * 100)
-                  : 0}
-                %
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-base-content/70">Content Moderation</span>
-              <span
-                className={`text-2xl font-bold ${
-                  totalReports > 0 ? 'text-red-500' : 'text-green-500'
-                }`}
-              >
-                {totalReports > 0 ? `${totalReports} Reports` : 'Clean'}
-              </span>
-            </div>
-          </div>
-
-          {totalReports > 0 && (
-            <div className="mt-6 p-4 bg-red-500/10 rounded-xl border border-red-500/20">
-              <h3 className="font-bold text-red-600 mb-2">Action Required</h3>
-              <p className="text-sm text-base-content/70 mb-3">
-                {totalReports} reported lessons need your attention
-              </p>
-              <Link
-                to="/dashboard/admin/reported_lessons"
-                className="btn btn-error btn-sm"
-              >
-                <FaFlag className="w-4 h-4 mr-2" />
-                Review Reports
-              </Link>
-            </div>
-          )}
-        </motion.div>
+        <div className="rounded-2xl border bg-base-100 p-6 shadow">
+          <h3 className="mb-4 text-lg font-bold">Top Contributors</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={contributors}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="lessons" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
