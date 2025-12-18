@@ -104,7 +104,7 @@ Every day, people learn critical lessons from their experiences—but most of th
 ### Quick Start
 ```bash
 # Clone the repository
-git clone [https://github.com/eistiakahmed/Digital_Life_Lessons_Frontend.git]
+git clone https://github.com/eistiakahmed/Digital_Life_Lessons_Frontend.git
 cd digital-life-lessons
 
 # Install dependencies
