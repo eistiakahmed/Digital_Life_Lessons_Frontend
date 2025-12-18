@@ -4,7 +4,7 @@
 
 Digital Life Lessons is a modern platform for preserving and sharing real-life insights. Whether it’s personal growth, career lessons, relationship wisdom, or health breakthroughs, this platform ensures valuable experiences aren’t lost and helps others learn from them.
 
-🌐 **Live Site:** [[https://digital-life-lessons.netlify.app/](https://digital-life-lessons.netlify.app/)]
+🌐 **Live Site:** [{https://digital-life-lessons.netlify.app/)(https://digital-life-lessons.netlify.app/)]
 
 ---
 
@@ -104,7 +104,7 @@ Every day, people learn critical lessons from their experiences—but most of th
 ### Quick Start
 ```bash
 # Clone the repository
-git clone [[https://github.com/eistiakahmed/Digital_Life_Lessons_Frontend.git](https://github.com/eistiakahmed/Digital_Life_Lessons_Frontend.git)]
+git clone [https://github.com/eistiakahmed/Digital_Life_Lessons_Frontend.git]
 cd digital-life-lessons
 
 # Install dependencies
