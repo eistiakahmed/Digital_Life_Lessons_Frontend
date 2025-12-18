@@ -14,6 +14,7 @@ import {
   FaLock,
   FaGlobe,
 } from 'react-icons/fa';
+import Spinner from '../../../Components/Spinner/Spinner';
 
 const categories = [
   'Personal Growth',
@@ -42,7 +43,7 @@ const UpdateLesson = () => {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
+    
     setValue,
   } = useForm();
 
@@ -146,7 +147,9 @@ const UpdateLesson = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-96">
-        <div className="loading loading-spinner loading-lg"></div>
+        <div className="">
+          <Spinner />
+        </div>
       </div>
     );
   }

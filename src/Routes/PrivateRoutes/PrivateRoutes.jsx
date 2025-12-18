@@ -3,6 +3,7 @@ import React from 'react';
 // import { ClimbingBoxLoader } from 'react-spinners';
 import { Navigate, useLocation } from 'react-router';
 import useAuth from '../../hooks/useAuth';
+import Spinner from '../../Components/Spinner/Spinner';
 
 const PrivateRoutes = ({ children }) => {
   const { user, loading } = useAuth();
@@ -12,9 +13,9 @@ const PrivateRoutes = ({ children }) => {
     return (
       <div className="h-screen flex justify-center items-center">
         {/* <ClimbingBoxLoader /> */}
-        <p className="">
-          Loading....
-        </p>
+        <div className="">
+          <Spinner />
+        </div>
       </div>
     );
   }

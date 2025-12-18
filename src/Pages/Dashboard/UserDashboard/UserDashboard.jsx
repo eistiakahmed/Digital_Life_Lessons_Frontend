@@ -15,6 +15,7 @@ import {
   FaGraduationCap,
 } from 'react-icons/fa';
 import { LuTrendingUp } from 'react-icons/lu';
+import Spinner from '../../../Components/Spinner/Spinner';
 
 const UserDashboard = () => {
   const { user } = useAuth();
@@ -127,7 +128,9 @@ const UserDashboard = () => {
   if (userLoading || lessonsLoading || favoritesLoading) {
     return (
       <div className="flex justify-center items-center min-h-96">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
+        <div className="">
+          <Spinner />
+        </div>
       </div>
     );
   }
@@ -289,7 +292,7 @@ const UserDashboard = () => {
                     <div className="flex items-center gap-4 text-sm text-base-content/60">
                       <span className="flex items-center gap-1">
                         <FaEye className="w-3 h-3" />
-                        {lesson.views || 0}
+                        {Math.floor(Math.random() * 1000)}
                       </span>
                       <span className="flex items-center gap-1">
                         <FaHeart className="w-3 h-3" />

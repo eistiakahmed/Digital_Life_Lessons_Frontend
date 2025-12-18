@@ -36,7 +36,7 @@ import { MdBookmark, MdMood, MdOutlineUpdate } from 'react-icons/md';
 import { HiOutlineViewGrid } from 'react-icons/hi';
 import { TbWorld } from 'react-icons/tb';
 import { FcLike } from 'react-icons/fc';
-
+import Spinner from '../../Components/Spinner/Spinner';
 
 const LessonDetails = () => {
   const { id } = useParams();
@@ -237,7 +237,9 @@ const LessonDetails = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg"></span>
+        <span className="">
+          <Spinner />
+        </span>
       </div>
     );
   }

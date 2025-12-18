@@ -26,6 +26,7 @@ import ReportedLessons from '../Pages/Dashboard/Admin/ReportedLessons';
 import AdminProfile from '../Pages/Dashboard/Admin/AdminProfile';
 import AdminRoutes from './AdminRoutes/AdminRoutes';
 import PublicProfile from '../Pages/PublicProfile/PublicProfile';
+import React_Lottie from '../Components/React_Lottie/React_Lottie';
 
 export const router = createBrowserRouter([
   {
@@ -168,6 +169,10 @@ export const router = createBrowserRouter([
           </AdminRoutes>
         ),
       },
+      {
+        path: 'react_lottie',
+        element: <React_Lottie />
+      }
     ],
   },
   {

@@ -11,6 +11,7 @@ import {
   FaStar,
   FaBookOpen,
 } from 'react-icons/fa';
+import Spinner from '../../../Components/Spinner/Spinner';
 
 const FeaturedLessons = () => {
   const axios = useAxios();
@@ -28,7 +29,9 @@ const FeaturedLessons = () => {
     return (
       <section className="py-16">
         <div className="text-center">
-          <div className="loading loading-spinner loading-lg"></div>
+          <div className="">
+            <Spinner />
+          </div>
         </div>
       </section>
     );

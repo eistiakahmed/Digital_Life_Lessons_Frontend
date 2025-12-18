@@ -35,38 +35,7 @@ const PaymentSuccess = () => {
     }
   }, [sessionId, axios]);
 
-  const premiumFeatures = [
-    {
-      icon: <FaInfinity className="w-6 h-6" />,
-      title: 'Unlimited Lessons',
-      description: 'Create as many lessons as you want',
-    },
-    {
-      icon: <FaCrown className="w-6 h-6" />,
-      title: 'Premium Templates',
-      description: 'Access exclusive lesson templates',
-    },
-    {
-      icon: <FaStar className="w-6 h-6" />,
-      title: 'Priority Listing',
-      description: 'Your lessons get featured placement',
-    },
-    {
-      icon: <FaShieldAlt className="w-6 h-6" />,
-      title: 'Ad-Free Experience',
-      description: 'Enjoy completely ad-free browsing',
-    },
-    {
-      icon: <FaGem className="w-6 h-6" />,
-      title: 'Advanced Export',
-      description: 'Export to PDF, Word, PowerPoint',
-    },
-    {
-      icon: <FaBookOpen className="w-6 h-6" />,
-      title: 'Premium Content',
-      description: 'Access all premium lessons',
-    },
-  ];
+ 
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">

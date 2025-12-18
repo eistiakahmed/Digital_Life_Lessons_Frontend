@@ -21,6 +21,7 @@ import {
   FaChartLine,
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import Spinner from '../../../Components/Spinner/Spinner';
 
 const UserProfile = () => {
   const { user, updateUserProfile, loading } = useAuth();
@@ -35,7 +36,7 @@ const UserProfile = () => {
   });
 
   // Fetch current user data
-  const { data: currentUser } = useQuery({
+  const { data: currentUser = [] , isLoading: profileLoading } = useQuery({
     queryKey: ['currentUser', user?.email],
     queryFn: async () => {
       if (!user?.email) return null;
@@ -111,10 +112,12 @@ const UserProfile = () => {
     setIsEditing(false);
   };
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="flex justify-center items-center min-h-96">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
+        <div className="">
+          <Spinner />
+        </div>
       </div>
     );
   }
@@ -376,7 +379,9 @@ const UserProfile = () => {
 
         {lessonsLoading ? (
           <div className="flex justify-center py-12">
-            <div className="loading loading-spinner loading-lg text-primary"></div>
+            <div className="">
+              <Spinner />
+            </div>
           </div>
         ) : recentLessons.length === 0 ? (
           <div className="text-center py-16">

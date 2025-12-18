@@ -14,6 +14,7 @@ import {
   FaFilter,
 } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import Spinner from '../../../Components/Spinner/Spinner';
 
 /* ---------- Stat Card ---------- */
 const StatCard = ({ icon, label, value }) => (
@@ -148,7 +149,9 @@ const ReportedLessons = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-96">
-        <div className="loading loading-spinner loading-lg"></div>
+        <div className="">
+          <Spinner />
+        </div>
       </div>
     );
   }

@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import useAuth from '../../../hooks/useAuth';
 import useAxios from '../../../hooks/useAxios';
+import Spinner from '../../../Components/Spinner/Spinner';
+import { useNavigate } from 'react-router';
 
 const categories = [
   'Personal Growth',
@@ -21,6 +23,7 @@ const AddLesson = () => {
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const navigate = useNavigate()
 
   const {
     register,
@@ -78,6 +81,7 @@ const AddLesson = () => {
       if (res.data.insertedId) {
         toast.success('Lesson Created Successfully!');
         reset();
+        navigate('/dashboard/react_lottie')
       } else {
         toast.error('Failed to create lesson');
       }
@@ -94,7 +98,9 @@ const AddLesson = () => {
   };
 
   if (loading) {
-    return <p className="text-center mt-8">Loading user data...</p>;
+    return <p className="text-center mt-8">
+      <Spinner />
+    </p>;
   }
 
   return (

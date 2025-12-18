@@ -9,6 +9,7 @@ import {
   FaBookOpen,
   FaFire,
 } from 'react-icons/fa';
+import Spinner from '../../../Components/Spinner/Spinner';
 
 const MostSavedLessons = () => {
   const axios = useAxios();
@@ -27,7 +28,9 @@ const MostSavedLessons = () => {
     return (
       <section className="py-16">
         <div className="text-center">
-          <div className="loading loading-spinner loading-lg"></div>
+          <div className="">
+            <Spinner />
+          </div>
         </div>
       </section>
     );

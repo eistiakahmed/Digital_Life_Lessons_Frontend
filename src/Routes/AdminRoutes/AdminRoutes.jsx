@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router';
 import useAuth from '../../hooks/useAuth';
+import Spinner from '../../Components/Spinner/Spinner';
 
 const AdminRoutes = ({ children }) => {
   const { user, userDB, loading } = useAuth();
@@ -7,7 +8,9 @@ const AdminRoutes = ({ children }) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="loading loading-spinner loading-lg"></div>
+        <div className="">
+          <Spinner />
+        </div>
       </div>
     );
   }

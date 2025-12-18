@@ -17,6 +17,7 @@ import {
   FaCalendarAlt,
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import Spinner from '../../../Components/Spinner/Spinner';
 
 const Profile = () => {
   const { user, updateUserProfile, loading } = useAuth();
@@ -260,7 +261,9 @@ const Profile = () => {
 
           {lessonsLoading ? (
             <div className="flex justify-center py-8">
-              <div className="loading loading-spinner loading-lg"></div>
+              <div className="">
+                <Spinner />
+              </div>
             </div>
           ) : userLessons.length === 0 ? (
             <div className="text-center py-12">

@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
+import Spinner from '../../Components/Spinner/Spinner';
 
 const features = [
   {
@@ -240,7 +241,9 @@ const Pricing = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="loading loading-spinner loading-lg"></div>
+        <div className="">
+          <Spinner />
+        </div>
       </div>
     );
   }

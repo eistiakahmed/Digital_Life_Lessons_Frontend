@@ -16,6 +16,7 @@ import {
   FaUser,
   FaBookOpen,
 } from 'react-icons/fa';
+import Spinner from '../../Components/Spinner/Spinner';
 
 const categories = [
   'All',
@@ -105,7 +106,9 @@ const PublicLessons = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="loading loading-spinner loading-lg"></div>
+        <div className="">
+          <Spinner />
+        </div>
       </div>
     );
   }

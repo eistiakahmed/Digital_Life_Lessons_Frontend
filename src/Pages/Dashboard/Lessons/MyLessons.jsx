@@ -7,6 +7,7 @@ import { Link } from 'react-router';
 import { AiFillEye, AiOutlineEdit, AiFillDelete } from 'react-icons/ai';
 import { FaHeart } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import Spinner from '../../../Components/Spinner/Spinner';
 
 const MyLessons = () => {
   const { user } = useAuth();
@@ -91,10 +92,12 @@ const MyLessons = () => {
 
   /* ================= UI States ================= */
   if (isLoading) {
-    return <p className="text-center text-xl pt-10">Loading lessons...</p>;
+    return (
+      <p className="text-center text-xl pt-10">
+        <Spinner />
+      </p>
+    );
   }
-
-  
 
   return (
     <div>

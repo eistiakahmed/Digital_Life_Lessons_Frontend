@@ -11,6 +11,7 @@ import {
   FaMedal,
   FaStar,
 } from 'react-icons/fa';
+import Spinner from '../../../Components/Spinner/Spinner';
 
 const TopContributors = () => {
   const axios = useAxios();
@@ -29,7 +30,9 @@ const TopContributors = () => {
     return (
       <section className="py-16 bg-base-200">
         <div className="text-center">
-          <div className="loading loading-spinner loading-lg"></div>
+          <div className="">
+            <Spinner />
+          </div>
         </div>
       </section>
     );

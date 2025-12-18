@@ -15,6 +15,7 @@ import {
   FaBookOpen,
 } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import Spinner from '../../../Components/Spinner/Spinner';
 
 const ManageUsers = () => {
   const { user } = useAuth();
@@ -166,7 +167,9 @@ const ManageUsers = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-96">
-        <div className="loading loading-spinner loading-lg"></div>
+        <div>
+          <Spinner />
+        </div>
       </div>
     );
   }

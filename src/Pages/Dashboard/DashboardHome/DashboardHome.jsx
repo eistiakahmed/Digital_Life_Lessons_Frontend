@@ -12,6 +12,7 @@ import {
   FaCalendarAlt,
   FaChartLine,
 } from 'react-icons/fa';
+import Spinner from '../../../Components/Spinner/Spinner';
 
 const DashboardHome = () => {
   const { user } = useAuth();
@@ -128,7 +129,9 @@ const DashboardHome = () => {
   if (userLoading || lessonsLoading || favoritesLoading) {
     return (
       <div className="flex justify-center items-center min-h-96">
-        <div className="loading loading-spinner loading-lg"></div>
+        <div >
+          <Spinner />
+        </div>
       </div>
     );
   }

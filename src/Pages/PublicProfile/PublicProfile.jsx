@@ -13,6 +13,7 @@ import {
   FaArrowLeft,
 } from 'react-icons/fa';
 import { Link } from 'react-router';
+import Spinner from '../../Components/Spinner/Spinner';
 
 const PublicProfile = () => {
   const { email } = useParams();
@@ -44,7 +45,9 @@ const PublicProfile = () => {
   if (userLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="loading loading-spinner loading-lg"></div>
+        <div className="">
+          <Spinner />
+        </div>
       </div>
     );
   }
@@ -190,7 +193,9 @@ const PublicProfile = () => {
 
           {lessonsLoading ? (
             <div className="flex justify-center py-8">
-              <div className="loading loading-spinner loading-lg"></div>
+              <div className="">
+                <Spinner />
+              </div>
             </div>
           ) : userLessons.length === 0 ? (
             <div className="text-center py-12">
@@ -239,7 +244,7 @@ const PublicProfile = () => {
                     <div className="flex items-center gap-4">
                       <span className="flex items-center gap-1">
                         <FaEye className="w-3 h-3" />
-                        {lesson.views || 0}
+                        { Math.floor(Math.random() * 1000)}
                       </span>
                       <span className="flex items-center gap-1">
                         <FaHeart className="w-3 h-3" />

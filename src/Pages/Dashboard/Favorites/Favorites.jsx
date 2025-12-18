@@ -14,6 +14,7 @@ import {
   FaFilter,
   FaTrash,
 } from 'react-icons/fa';
+import Spinner from '../../../Components/Spinner/Spinner';
 
 const categories = [
   'All',
@@ -83,7 +84,7 @@ const Favorites = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-96">
-        <div className="loading loading-spinner loading-lg"></div>
+        <Spinner />
       </div>
     );
   }
@@ -97,7 +98,7 @@ const Favorites = () => {
         transition={{ duration: 0.6 }}
         className="text-center"
       >
-        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold mb-4 bg-linear-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent">
           My Favorite Lessons
         </h1>
         <p className="text-base-content/70 text-lg">

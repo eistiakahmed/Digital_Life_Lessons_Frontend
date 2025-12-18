@@ -104,7 +104,7 @@ const AdminDashboard = () => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-3xl bg-gradient-to-r from-primary to-secondary p-8 text-primary-content shadow-lg"
+        className="rounded-3xl bg-linear-to-r from-primary to-secondary p-8 text-primary-content shadow-lg"
       >
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <p className="opacity-80">System overview & analytics</p>
@@ -115,7 +115,7 @@ const AdminDashboard = () => {
           <motion.div
             key={i}
             whileHover={{ scale: 1.03 }}
-            className={`rounded-2xl bg-gradient-to-r ${s.gradient} p-6 text-white shadow-lg`}
+            className={`rounded-2xl bg-linear-to-r ${s.gradient} p-6 text-white shadow-lg`}
           >
             <div className="flex items-center justify-between">
               <div>
