@@ -44,7 +44,7 @@ const FeaturedLessons = () => {
   }
 
   return (
-    <section className="py-16">
+    <section className="py-16" id="featured-lessons">
       <div className="px-4">
         {/* Section Header */}
         <motion.div

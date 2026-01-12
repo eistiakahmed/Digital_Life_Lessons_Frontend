@@ -15,11 +15,13 @@ import useAxios from '../../hooks/useAxios';
 import { useState } from 'react';
 import { IoIosEye, IoIosEyeOff } from 'react-icons/io';
 import { syncUserWithBackend } from '../../utils/userSync';
+import { FormInput, LoadingButton } from '../../Components/FormComponents';
 
 const Login = () => {
   const { signInUser, signInGoogle } = useAuth();
   const axios = useAxios();
   const [textToggling, setTextToggling] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,16 +31,17 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
-  const handleLogin = (data) => {
-    signInUser(data.email, data.password)
-      .then(() => {
-        toast.success('Login Successfully');
-        navigate(location?.state || '/');
-      })
-      .catch((error) => {
-        // console.log(error);
-        toast.error(error.message);
-      });
+  const handleLogin = async (data) => {
+    setIsLoading(true);
+    try {
+      await signInUser(data.email, data.password);
+      toast.success('Login Successfully');
+      navigate(location?.state || '/');
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleLogin = async () => {

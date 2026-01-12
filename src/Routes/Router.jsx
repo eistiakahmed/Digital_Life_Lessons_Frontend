@@ -27,6 +27,11 @@ import AdminProfile from '../Pages/Dashboard/Admin/AdminProfile';
 import AdminRoutes from './AdminRoutes/AdminRoutes';
 import PublicProfile from '../Pages/PublicProfile/PublicProfile';
 import React_Lottie from '../Components/React_Lottie/React_Lottie';
+import Terms from '../Pages/Terms/Terms';
+import Privacy from '../Pages/Privacy/Privacy';
+import About from '../Pages/About/About';
+import Contact from '../Pages/Contact/Contact';
+import Blog from '../Pages/Blog/Blog';
 
 export const router = createBrowserRouter([
   {
@@ -69,6 +74,26 @@ export const router = createBrowserRouter([
       {
         path: '/profile/:email',
         element: <PublicProfile />,
+      },
+      {
+        path: '/contact',
+        element: <Contact />,
+      },
+      {
+        path: '/about',
+        element: <About />,
+      },
+      {
+        path: '/terms',
+        element: <Terms />,
+      },
+      {
+        path: '/blog',
+        element: <Blog />
+      },
+      {
+        path: '/privacy',
+        element: <Privacy />,
       },
       {
         path: '/payment/success',

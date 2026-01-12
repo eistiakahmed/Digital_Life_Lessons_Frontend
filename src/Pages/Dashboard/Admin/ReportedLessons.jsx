@@ -18,7 +18,7 @@ import Spinner from '../../../Components/Spinner/Spinner';
 
 /* ---------- Stat Card ---------- */
 const StatCard = ({ icon, label, value }) => (
-  <div className="p-4 border rounded-xl flex items-center gap-4">
+  <div className="p-4 shadow-md rounded-xl flex items-center gap-4">
     <div className="text-xl">{icon}</div>
     <div>
       <p className="text-2xl font-bold">{value}</p>
@@ -56,54 +56,82 @@ const ReportedLessons = () => {
     fetchReportedLessons();
   }, [fetchReportedLessons]);
 
-  const resolveReport = async (reportId, action) => {
+  // Resolve report - using lessonId to resolve all reports for that lesson
+  const resolveReport = async (lessonId, action) => {
+    if (!lessonId) {
+      toast.error('Lesson ID not found');
+      return;
+    }
+
     const result = await Swal.fire({
-      title: 'Resolve Report?',
-      text: `Are you sure you want to ${action === 'dismiss' ? 'dismiss' : 'resolve'} this report?`,
+      title: 'Resolve All Reports?',
+      text: `This will ${
+        action === 'dismiss' ? 'dismiss' : 'resolve'
+      } ALL reports for this lesson. Continue?`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, resolve it!'
+      confirmButtonText: 'Yes, resolve them!',
     });
 
     if (!result.isConfirmed) return;
 
     try {
       setIsProcessing(true);
-      await axios.patch(`/admin/reports/${reportId}/resolve`, { action });
-      toast.success('Report resolved successfully');
+      // Using existing backend endpoint that resolves all reports for a lesson
+      await axios.patch(`/admin/reported-lessons/${lessonId}/ignore`, {
+        action,
+      });
+      toast.success('All reports for this lesson resolved successfully');
       fetchReportedLessons();
     } catch (error) {
       console.error(error);
-      toast.error('Failed to resolve report');
+      toast.error('Failed to resolve reports');
     } finally {
       setIsProcessing(false);
     }
   };
 
+  // Delete lesson and all its reports
   const deleteLesson = async (lessonId, lessonTitle) => {
+    // Enhanced validation with debugging
+    if (!lessonId) {
+      console.error('Delete failed: lessonId is', lessonId);
+      toast.error(
+        'Lesson ID not found. The lesson may have been deleted already.'
+      );
+      return;
+    }
+
     const result = await Swal.fire({
       title: 'Delete Lesson?',
-      html: `Are you sure you want to delete "<strong>${lessonTitle}</strong>"?<br><br><span style="color: red;">This action cannot be undone!</span>`,
+      html: `Are you sure you want to delete "<strong>${
+        lessonTitle || 'this lesson'
+      }</strong>"?<br><br><span style="color: red;">This action cannot be undone!</span>`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel'
+      cancelButtonText: 'Cancel',
     });
 
     if (!result.isConfirmed) return;
 
     try {
       setIsProcessing(true);
-      await axios.delete(`/lessons/${lessonId}`);
-      toast.success('Lesson deleted successfully');
+      // Using existing backend endpoint
+      await axios.delete(`/admin/reported-lessons/${lessonId}`);
+      toast.success('Lesson and all reports deleted successfully');
       fetchReportedLessons();
     } catch (error) {
-      console.error(error);
-      toast.error('Failed to delete lesson');
+      console.error('Delete error:', error);
+      if (error.response?.status === 404) {
+        toast.error('Lesson not found. It may have been deleted already.');
+      } else {
+        toast.error('Failed to delete lesson');
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -114,8 +142,9 @@ const ReportedLessons = () => {
     Array.isArray(item.reports)
       ? item.reports.map((report) => ({
           ...report,
-          lessonId: item.lesson?._id,
-          lessonTitle: item.lesson?.title,
+          // Use report.lessonId first, fallback to item.lesson?._id, then item._id
+          lessonId: report.lessonId || item.lesson?._id || item._id,
+          lessonTitle: item.lesson?.title || 'Deleted Lesson',
         }))
       : []
   );
@@ -138,7 +167,9 @@ const ReportedLessons = () => {
   });
 
   // Get unique reasons for filter dropdown
-  const uniqueReasons = [...new Set(allReports.map(r => r.reason))].filter(Boolean);
+  const uniqueReasons = [...new Set(allReports.map((r) => r.reason))].filter(
+    Boolean
+  );
 
   // Calculate stats
   const totalReports = allReports.length;
@@ -158,30 +189,36 @@ const ReportedLessons = () => {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-4xl font-bold text-center">Reported Lessons</h1>
+      <h1 className="text-4xl font-bold text-center text-primary">
+        Reported Lessons
+      </h1>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard
-          icon={<FaFlag color='blue'/>}
+          icon={<FaFlag color="blue" />}
           label="Total Reports"
           value={totalReports}
         />
         <StatCard
-          icon={<FaExclamationTriangle color='orange'/>}
+          icon={<FaExclamationTriangle color="orange" />}
           label="Pending"
           value={pendingReports}
         />
-        <StatCard icon={<FaCheck color='green'/>} label="Resolved" value={resolvedReports} />
         <StatCard
-          icon={<FaBookOpen color='purple'/>}
+          icon={<FaCheck color="green" />}
+          label="Resolved"
+          value={resolvedReports}
+        />
+        <StatCard
+          icon={<FaBookOpen color="purple" />}
           label="Unique Lessons"
           value={uniqueLessons}
         />
       </div>
 
       {/* Filters Section */}
-      <div className="bg-base-100 rounded-xl border p-4">
+      <div className="bg-base-100 rounded-xl shadow-md p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search */}
           <div className="form-control">
@@ -260,7 +297,7 @@ const ReportedLessons = () => {
       </div>
 
       {/* Reports Table */}
-      <div className="overflow-x-auto bg-base-100 rounded-xl border">
+      <div className="overflow-x-auto bg-base-100 rounded-xl shadow-md">
         <table className="table">
           <thead>
             <tr>
@@ -279,7 +316,7 @@ const ReportedLessons = () => {
                 <td>{index + 1}</td>
                 <td>
                   <div className="font-medium">
-                    {report.lessonTitle || 'Unknown Lesson'}
+                    {report.reportLessonTitle || 'Unknown Lesson'}
                   </div>
                 </td>
                 <td>
@@ -288,12 +325,14 @@ const ReportedLessons = () => {
                   </div>
                 </td>
                 <td>
-                  <span className="badge badge-outline">
-                    {report.reason}
-                  </span>
+                  <span className="badge badge-outline">{report.reason}</span>
                 </td>
                 <td>
-                  <span className={`badge ${report.resolved ? 'badge-success' : 'badge-warning'}`}>
+                  <span
+                    className={`badge ${
+                      report.resolved ? 'badge-success' : 'badge-warning'
+                    }`}
+                  >
                     {report.resolved ? 'Resolved' : 'Pending'}
                   </span>
                 </td>
@@ -314,18 +353,26 @@ const ReportedLessons = () => {
                       <>
                         <button
                           disabled={isProcessing}
-                          onClick={() => resolveReport(report._id, 'dismiss')}
+                          onClick={() =>
+                            resolveReport(report.lessonId, 'dismiss')
+                          }
                           className="btn btn-xs btn-success"
-                          title="Dismiss Report"
+                          title="Dismiss All Reports for This Lesson"
                         >
                           <FaCheck />
                         </button>
 
                         <button
-                          disabled={isProcessing}
-                          onClick={() => deleteLesson(report.lessonId, report.lessonTitle)}
+                          disabled={isProcessing || !report.lessonId}
+                          onClick={() =>
+                            deleteLesson(report.lessonId, report.lessonTitle)
+                          }
                           className="btn btn-xs btn-error"
-                          title="Delete Lesson"
+                          title={
+                            !report.lessonId
+                              ? 'Lesson already deleted'
+                              : 'Delete Lesson'
+                          }
                         >
                           <FaTrash />
                         </button>
@@ -342,7 +389,9 @@ const ReportedLessons = () => {
           <div className="text-center py-10">
             <FaFlag className="w-16 h-16 mx-auto text-base-content/20 mb-4" />
             <p className="text-base-content/60">
-              {totalReports === 0 ? 'No reports found' : 'No reports match your filters'}
+              {totalReports === 0
+                ? 'No reports found'
+                : 'No reports match your filters'}
             </p>
           </div>
         )}
