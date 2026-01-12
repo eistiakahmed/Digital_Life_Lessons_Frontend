@@ -5,6 +5,7 @@ import { Link } from 'react-router';
 import useAuth from '../../hooks/useAuth';
 import useAxios from '../../hooks/useAxios';
 import LessonCard from '../LessonCard/LessonCard';
+import LessonCardSkeleton from '../../Components/LoadingSkeleton/LessonCardSkeleton';
 import {
   FaSearch,
   FaFilter,
@@ -105,9 +106,30 @@ const PublicLessons = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="min-h-screen bg-base-200 py-8">
         <div className="">
-          <Spinner />
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h1 className="text-5xl font-extrabold mb-4 bg-linear-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent">
+              Public Life Lessons
+            </h1>
+            <p className="text-lg text-base-content/70 max-w-3xl mx-auto">
+              Discover wisdom and insights shared by our community. Learn from
+              others' experiences and grow together.
+            </p>
+          </motion.div>
+
+          {/* Loading Skeletons */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            {Array.from({ length: 8 }, (_, index) => (
+              <LessonCardSkeleton key={index} />
+            ))}
+          </div>
         </div>
       </div>
     );

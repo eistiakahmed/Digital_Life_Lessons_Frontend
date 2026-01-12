@@ -325,6 +325,19 @@ const Register = () => {
                 Continue with Google
               </motion.button>
 
+              {/* Demo Login Button */}
+              <Link to="/login">
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="btn w-full btn-outline btn-info gap-3 font-semibold"
+                >
+                  <FaUser className="w-4 h-4" />
+                  Try Demo Account
+                </motion.button>
+              </Link>
+
               <p className="text-center text-sm text-base-content/70 mt-4">
                 Already have an account?{' '}
                 <Link

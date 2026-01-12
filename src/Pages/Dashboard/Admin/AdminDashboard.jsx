@@ -20,24 +20,31 @@ import {
   FaFire,
 } from 'react-icons/fa';
 import useAxios from '../../../hooks/useAxios';
+import AdminDashboardSkeleton from '../../../Components/LoadingSkeleton/AdminDashboardSkeleton';
 
 const AdminDashboard = () => {
   const axios = useAxios();
 
-  const { data: users = [] } = useQuery({
+  const { data: users = [], isLoading: usersLoading } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => (await axios.get('/users')).data,
   });
 
-  const { data: lessons = [] } = useQuery({
+  const { data: lessons = [], isLoading: lessonsLoading } = useQuery({
     queryKey: ['admin-lessons'],
     queryFn: async () => (await axios.get('/admin/lessons')).data,
   });
 
-  const { data: reports = [] } = useQuery({
+  const { data: reports = [], isLoading: reportsLoading } = useQuery({
     queryKey: ['admin-reports'],
     queryFn: async () => (await axios.get('/admin/reported-lessons')).data,
   });
+
+  const isLoading = usersLoading || lessonsLoading || reportsLoading;
+
+  if (isLoading) {
+    return <AdminDashboardSkeleton />;
+  }
 
   const stats = [
     {

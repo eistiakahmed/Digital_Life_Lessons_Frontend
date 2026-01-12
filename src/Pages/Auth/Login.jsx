@@ -10,6 +10,7 @@ import {
   FaGoogle,
   FaArrowRight,
   FaCheckCircle,
+  FaUser,
 } from 'react-icons/fa';
 import useAxios from '../../hooks/useAxios';
 import { useState } from 'react';
@@ -266,6 +267,22 @@ const Login = () => {
               >
                 <FaGoogle className="w-5 h-5 text-red-500" />
                 Continue with Google
+              </motion.button>
+
+              {/* Demo Login Button */}
+              <motion.button
+                type="button"
+                onClick={() => {
+                  // Auto-fill demo credentials
+                  document.querySelector('input[type="email"]').value = 'demo@digitallifelessons.com';
+                  document.querySelector('input[type="password"]').value = 'Demo123!@#';
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="btn w-full btn-outline btn-info gap-3 font-semibold"
+              >
+                <FaUser className="w-4 h-4" />
+                Try Demo Account
               </motion.button>
 
               <p className="text-center text-sm text-base-content/70 mt-6">

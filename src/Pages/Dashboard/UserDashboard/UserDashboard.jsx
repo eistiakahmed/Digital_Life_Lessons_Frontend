@@ -16,6 +16,7 @@ import {
 } from 'react-icons/fa';
 import { LuTrendingUp } from 'react-icons/lu';
 import Spinner from '../../../Components/Spinner/Spinner';
+import DashboardSkeleton from '../../../Components/LoadingSkeleton/DashboardSkeleton';
 
 const UserDashboard = () => {
   const { user } = useAuth();
@@ -126,13 +127,7 @@ const UserDashboard = () => {
 
 
   if (userLoading || lessonsLoading || favoritesLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-96">
-        <div className="">
-          <Spinner />
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
