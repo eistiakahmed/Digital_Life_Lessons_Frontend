@@ -16,6 +16,7 @@ import {
   FaArrowRight,
   FaCheckCircle,
   FaRocket,
+  FaShieldAlt,
 } from 'react-icons/fa';
 import useAxios from '../../hooks/useAxios';
 import { syncUserWithBackend } from '../../utils/userSync';
@@ -276,7 +277,7 @@ const Register = () => {
                 <button
                   onClick={() => setTextToggling(!textToggling)}
                   type="button"
-                  className="absolute right-3 top-9 text-base-content/60 hover:text-base-content transition-colors"
+                  className="absolute right-1 top-7 text-base-content/60 hover:text-base-content transition-colors"
                 >
                   {textToggling ? (
                     <IoIosEyeOff size={22} />
@@ -325,18 +326,38 @@ const Register = () => {
                 Continue with Google
               </motion.button>
 
-              {/* Demo Login Button */}
-              <Link to="/login">
-                <motion.button
-                  type="button"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="btn w-full btn-outline btn-info gap-3 font-semibold"
-                >
-                  <FaUser className="w-4 h-4" />
-                  Try Demo Account
-                </motion.button>
-              </Link>
+              {/* Demo Login Buttons */}
+              <div className="space-y-3">
+                <p className="text-center text-sm text-base-content/60 font-medium">Or try our demo accounts:</p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* User Demo */}
+                  <Link to="/login">
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="btn w-full btn-outline btn-info gap-2 font-semibold"
+                    >
+                      <FaUser className="w-4 h-4" />
+                      User Demo
+                    </motion.button>
+                  </Link>
+
+                  {/* Admin Demo */}
+                  <Link to="/login">
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="btn w-full btn-outline btn-error gap-2 font-semibold"
+                    >
+                      <FaShieldAlt className="w-4 h-4" />
+                      Admin Demo
+                    </motion.button>
+                  </Link>
+                </div>
+              </div>
 
               <p className="text-center text-sm text-base-content/70 mt-4">
                 Already have an account?{' '}

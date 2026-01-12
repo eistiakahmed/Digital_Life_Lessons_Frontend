@@ -12,19 +12,28 @@ import {
   FaBookOpen,
   FaSearch,
   FaFilter,
+  FaCalendarAlt,
+  FaUserShield,
 } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import Spinner from '../../../Components/Spinner/Spinner';
 
 /* ---------- Stat Card ---------- */
-const StatCard = ({ icon, label, value }) => (
-  <div className="p-4 shadow-md rounded-xl flex items-center gap-4">
-    <div className="text-xl">{icon}</div>
-    <div>
-      <p className="text-2xl font-bold">{value}</p>
-      <p className="text-sm text-base-content/60">{label}</p>
+const StatCard = ({ icon, label, value, gradient, delay = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.6, delay }}
+    className={`bg-linear-to-r ${gradient} p-6 rounded-2xl text-white shadow-lg`}
+  >
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm opacity-80">{label}</p>
+        <p className="text-3xl font-bold">{value}</p>
+      </div>
+      <div className="text-4xl opacity-80">{icon}</div>
     </div>
-  </div>
+  </motion.div>
 );
 
 /* ---------- Main Component ---------- */
@@ -70,8 +79,8 @@ const ReportedLessons = () => {
       } ALL reports for this lesson. Continue?`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#10B981',
+      cancelButtonColor: '#EF4444',
       confirmButtonText: 'Yes, resolve them!',
     });
 
@@ -108,11 +117,11 @@ const ReportedLessons = () => {
       title: 'Delete Lesson?',
       html: `Are you sure you want to delete "<strong>${
         lessonTitle || 'this lesson'
-      }</strong>"?<br><br><span style="color: red;">This action cannot be undone!</span>`,
+      }</strong>"?<br><br><span style="color: #EF4444;">This action cannot be undone!</span>`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
+      confirmButtonColor: '#EF4444',
+      cancelButtonColor: '#4F46E5',
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'Cancel',
     });
@@ -189,213 +198,280 @@ const ReportedLessons = () => {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-4xl font-bold text-center text-primary">
-        Reported Lessons
-      </h1>
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center"
+      >
+        <h1 className="text-4xl font-bold mb-4 bg-linear-to-r from-red-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent">
+          Reported Lessons
+        </h1>
+        <p className="text-base-content/70 text-lg">
+          Review and manage reported content on the platform
+        </p>
+      </motion.div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <StatCard
-          icon={<FaFlag color="blue" />}
+          icon={<FaFlag />}
           label="Total Reports"
           value={totalReports}
+          gradient="from-blue-500 to-blue-700"
+          delay={0.1}
         />
         <StatCard
-          icon={<FaExclamationTriangle color="orange" />}
+          icon={<FaExclamationTriangle />}
           label="Pending"
           value={pendingReports}
+          gradient="from-orange-500 to-orange-700"
+          delay={0.2}
         />
         <StatCard
-          icon={<FaCheck color="green" />}
+          icon={<FaCheck />}
           label="Resolved"
           value={resolvedReports}
+          gradient="from-green-500 to-green-700"
+          delay={0.3}
         />
         <StatCard
-          icon={<FaBookOpen color="purple" />}
+          icon={<FaBookOpen />}
           label="Unique Lessons"
           value={uniqueLessons}
+          gradient="from-purple-500 to-purple-700"
+          delay={0.4}
         />
       </div>
 
       {/* Filters Section */}
-      <div className="bg-base-100 rounded-xl shadow-md p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+        className="bg-base-100 p-6 rounded-2xl shadow-lg border border-base-300"
+      >
+        <div className="flex items-center gap-4 mb-4">
+          <FaFilter className="w-5 h-5 text-primary" />
+          <h2 className="text-xl font-bold">Filter Reports</h2>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text flex items-center gap-2">
-                <FaSearch /> Search
-              </span>
-            </label>
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" />
             <input
               type="text"
               placeholder="Search by lesson title, reason, or reporter..."
-              className="input input-bordered w-full"
+              className="input input-bordered w-full pl-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
           {/* Filter by Reason */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text flex items-center gap-2">
-                <FaFilter /> Filter by Reason
-              </span>
-            </label>
-            <select
-              className="select select-bordered w-full"
-              value={filterReason}
-              onChange={(e) => setFilterReason(e.target.value)}
-            >
-              <option value="All">All Reasons</option>
-              {uniqueReasons.map((reason) => (
-                <option key={reason} value={reason}>
-                  {reason}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            className="select select-bordered w-full"
+            value={filterReason}
+            onChange={(e) => setFilterReason(e.target.value)}
+          >
+            <option value="All">All Reasons</option>
+            {uniqueReasons.map((reason) => (
+              <option key={reason} value={reason}>
+                {reason}
+              </option>
+            ))}
+          </select>
 
           {/* Filter by Status */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text flex items-center gap-2">
-                <FaFilter /> Filter by Status
-              </span>
-            </label>
-            <select
-              className="select select-bordered w-full"
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
-              <option value="All">All Status</option>
-              <option value="Pending">Pending</option>
-              <option value="Resolved">Resolved</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Results Summary */}
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-base-content/60">
-          Showing {filteredReports.length} of {totalReports} reports
-        </p>
-        {(searchTerm || filterReason !== 'All' || filterStatus !== 'All') && (
-          <button
-            onClick={() => {
-              setSearchTerm('');
-              setFilterReason('All');
-              setFilterStatus('All');
-            }}
-            className="btn btn-sm btn-ghost"
+          <select
+            className="select select-bordered w-full"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
           >
-            Clear Filters
-          </button>
-        )}
-      </div>
+            <option value="All">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
+
+        <div className="mt-4 text-sm text-base-content/60">
+          Showing {filteredReports.length} of {totalReports} reports
+          {(searchTerm || filterReason !== 'All' || filterStatus !== 'All') && (
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setFilterReason('All');
+                setFilterStatus('All');
+              }}
+              className="btn btn-sm btn-ghost ml-4"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+      </motion.div>
 
       {/* Reports Table */}
-      <div className="overflow-x-auto bg-base-100 rounded-xl shadow-md">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Serial No</th>
-              <th>Lesson Title</th>
-              <th>Reporter</th>
-              <th>Reason</th>
-              <th>Status</th>
-              <th>Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredReports.map((report, index) => (
-              <tr key={report._id}>
-                <td>{index + 1}</td>
-                <td>
-                  <div className="font-medium">
-                    {report.reportLessonTitle || 'Unknown Lesson'}
-                  </div>
-                </td>
-                <td>
-                  <div className="text-sm text-base-content/70">
-                    {report.reporterEmail || 'Anonymous'}
-                  </div>
-                </td>
-                <td>
-                  <span className="badge badge-outline">{report.reason}</span>
-                </td>
-                <td>
-                  <span
-                    className={`badge ${
-                      report.resolved ? 'badge-success' : 'badge-warning'
-                    }`}
-                  >
-                    {report.resolved ? 'Resolved' : 'Pending'}
-                  </span>
-                </td>
-                <td>{new Date(report.createdAt).toLocaleDateString()}</td>
-                <td>
-                  <div className="flex gap-2">
-                    {report.lessonId && (
-                      <Link
-                        to={`/lesson/${report.lessonId}`}
-                        className="btn btn-xs btn-info"
-                        title="View Lesson"
-                      >
-                        <FaEye />
-                      </Link>
-                    )}
-
-                    {!report.resolved && (
-                      <>
-                        <button
-                          disabled={isProcessing}
-                          onClick={() =>
-                            resolveReport(report.lessonId, 'dismiss')
-                          }
-                          className="btn btn-xs btn-success"
-                          title="Dismiss All Reports for This Lesson"
-                        >
-                          <FaCheck />
-                        </button>
-
-                        <button
-                          disabled={isProcessing || !report.lessonId}
-                          onClick={() =>
-                            deleteLesson(report.lessonId, report.lessonTitle)
-                          }
-                          className="btn btn-xs btn-error"
-                          title={
-                            !report.lessonId
-                              ? 'Lesson already deleted'
-                              : 'Delete Lesson'
-                          }
-                        >
-                          <FaTrash />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </td>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.7 }}
+        className="bg-base-100 rounded-2xl shadow-lg border border-base-300 overflow-hidden"
+      >
+        <div className="overflow-x-auto">
+          <table className="table w-full">
+            <thead className="bg-base-200">
+              <tr>
+                <th>Serial No</th>
+                <th>Lesson Title</th>
+                <th>Reporter</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredReports.map((report, index) => (
+                <motion.tr
+                  key={report._id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  className="hover"
+                >
+                  <td>
+                    <span className="font-medium text-base-content">
+                      {index + 1}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <FaBookOpen className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-base-content">
+                          {report.reportLessonTitle || 'Unknown Lesson'}
+                        </p>
+                        <p className="text-sm text-base-content/60">
+                          ID: {report.lessonId?.slice(-8) || 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <FaUserShield className="w-4 h-4 text-base-content/50" />
+                      <span className="text-sm text-base-content/70">
+                        {report.reporterEmail || 'Anonymous'}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <span className="badge badge-outline badge-lg">
+                      {report.reason}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      className={`badge badge-lg ${
+                        report.resolved 
+                          ? 'badge-success' 
+                          : 'badge-warning'
+                      }`}
+                    >
+                      {report.resolved ? (
+                        <>
+                          <FaCheck className="w-3 h-3 mr-1" />
+                          Resolved
+                        </>
+                      ) : (
+                        <>
+                          <FaExclamationTriangle className="w-3 h-3 mr-1" />
+                          Pending
+                        </>
+                      )}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="flex items-center gap-1 text-sm text-base-content/60">
+                      <FaCalendarAlt className="w-3 h-3" />
+                      {new Date(report.createdAt).toLocaleDateString()}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="flex gap-2">
+                      {report.lessonId && (
+                        <Link
+                          to={`/lesson/${report.lessonId}`}
+                          className="btn btn-sm btn-info"
+                          title="View Lesson"
+                        >
+                          <FaEye className="w-3 h-3" />
+                        </Link>
+                      )}
+
+                      {!report.resolved && (
+                        <>
+                          <button
+                            disabled={isProcessing}
+                            onClick={() =>
+                              resolveReport(report.lessonId, 'dismiss')
+                            }
+                            className="btn btn-sm btn-success"
+                            title="Dismiss All Reports for This Lesson"
+                          >
+                            <FaCheck className="w-3 h-3" />
+                          </button>
+
+                          <button
+                            disabled={isProcessing || !report.lessonId}
+                            onClick={() =>
+                              deleteLesson(report.lessonId, report.lessonTitle)
+                            }
+                            className="btn btn-sm btn-error"
+                            title={
+                              !report.lessonId
+                                ? 'Lesson already deleted'
+                                : 'Delete Lesson'
+                            }
+                          >
+                            <FaTrash className="w-3 h-3" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {filteredReports.length === 0 && (
-          <div className="text-center py-10">
-            <FaFlag className="w-16 h-16 mx-auto text-base-content/20 mb-4" />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="text-center py-16"
+          >
+            <div className="p-4 bg-base-200 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+              <FaFlag className="w-8 h-8 text-base-content/30" />
+            </div>
+            <h3 className="text-xl font-semibold text-base-content mb-2">
+              {totalReports === 0 ? 'No Reports Found' : 'No Matching Reports'}
+            </h3>
             <p className="text-base-content/60">
               {totalReports === 0
-                ? 'No reports found'
-                : 'No reports match your filters'}
+                ? 'There are currently no reported lessons on the platform.'
+                : 'Try adjusting your filters to see more results.'}
             </p>
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 };

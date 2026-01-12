@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router';
 
@@ -8,12 +8,6 @@ import {
   FaHome,
   FaTachometerAlt,
   FaBookOpen,
-  FaStar,
-  FaInfinity,
-  FaShieldAlt,
-  FaGem,
-  FaSync,
-  FaExclamationTriangle,
 } from 'react-icons/fa';
 import useAxios from '../../../hooks/useAxios';
 
@@ -25,7 +19,7 @@ const PaymentSuccess = () => {
 
   const sessionId = searchParams.get('session_id');
 
-  console.log(sessionId);
+  // console.log(sessionId);
 
   useEffect(() => {
     if (sessionId) {
@@ -34,8 +28,6 @@ const PaymentSuccess = () => {
       });
     }
   }, [sessionId, axios]);
-
- 
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
@@ -100,11 +92,8 @@ const PaymentSuccess = () => {
             <p className="text-base-content/60">
               You now have lifetime access to all premium features and content.
             </p>
-
-            
           </div>
         </motion.div>
-
 
         {/* Action Buttons */}
         <motion.div
@@ -169,8 +158,6 @@ const PaymentSuccess = () => {
             </p>
           </div>
         </motion.div>
-
-        
       </motion.div>
     </div>
   );

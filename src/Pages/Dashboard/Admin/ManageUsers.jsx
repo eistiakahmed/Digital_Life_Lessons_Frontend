@@ -345,6 +345,7 @@ const ManageUsers = () => {
                       <img
                         src={
                           userData.image ||
+                          userData.photoURL ||
                           'https://ui-avatars.com/api/?name=' +
                             encodeURIComponent(userData.name || 'User') +
                             '&background=6366f1&color=fff'

@@ -20,7 +20,6 @@ import {
   FaInfoCircle,
   FaChevronDown,
   FaBell,
-  FaCog,
   FaBlog,
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
@@ -30,7 +29,7 @@ const Navbar = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  
+
   const isAdmin = userDB?.role === 'admin';
   const isPremium = userDB?.isPremium;
 
@@ -39,7 +38,7 @@ const Navbar = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -83,33 +82,71 @@ const Navbar = () => {
   // Navigation links for logged in users (minimum 5)
   const privateLinks = [
     { to: '/', label: 'Home', icon: <FaHome className="w-4 h-4" /> },
-    { to: '/public_lessons', label: 'Explore', icon: <FaBookOpen className="w-4 h-4" /> },
-    { to: '/dashboard/add_lesson', label: 'Create', icon: <FaPlus className="w-4 h-4" /> },
-    { to: '/dashboard/my_lessons', label: 'My Lessons', icon: <FaUser className="w-4 h-4" /> },
-    { to: '/dashboard/favorites', label: 'Favorites', icon: <FaHeart className="w-4 h-4" /> },
-    ...(isAdmin ? [
-      { to: '/dashboard/admin', label: 'Admin', icon: <FaShieldAlt className="w-4 h-4" />, isAdmin: true }
-    ] : []),
-    ...(!isPremium && !isAdmin ? [
-      { to: '/pricing', label: 'Upgrade', icon: <FaCrown className="w-4 h-4" />, isPremium: true }
-    ] : []),
+    {
+      to: '/public_lessons',
+      label: 'Explore',
+      icon: <FaBookOpen className="w-4 h-4" />,
+    },
+    {
+      to: '/dashboard/add_lesson',
+      label: 'Create',
+      icon: <FaPlus className="w-4 h-4" />,
+    },
+    {
+      to: '/dashboard/my_lessons',
+      label: 'My Lessons',
+      icon: <FaUser className="w-4 h-4" />,
+    },
+    {
+      to: '/dashboard/favorites',
+      label: 'Favorites',
+      icon: <FaHeart className="w-4 h-4" />,
+    },
+    ...(isAdmin
+      ? [
+          {
+            to: '/dashboard/admin',
+            label: 'Admin',
+            icon: <FaShieldAlt className="w-4 h-4" />,
+            isAdmin: true,
+          },
+        ]
+      : []),
+    ...(!isPremium && !isAdmin
+      ? [
+          {
+            to: '/pricing',
+            label: 'Upgrade',
+            icon: <FaCrown className="w-4 h-4" />,
+            isPremium: true,
+          },
+        ]
+      : []),
   ];
 
   const currentLinks = user ? privateLinks : publicLinks;
 
-  const NavLinkComponent = ({ to, label, icon, isAdmin: linkIsAdmin, isPremium: linkIsPremium, mobile = false }) => (
+  const NavLinkComponent = ({
+    to,
+    label,
+    icon,
+    isAdmin: linkIsAdmin,
+    isPremium: linkIsPremium,
+    mobile = false,
+  }) => (
     <NavLink
       to={to}
       className={({ isActive }) => `
         flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200
         ${mobile ? 'w-full justify-start' : ''}
-        ${isActive 
-          ? linkIsAdmin 
-            ? 'bg-error/10 text-error border border-error/20' 
-            : linkIsPremium
-            ? 'bg-warning/10 text-warning border border-warning/20'
-            : 'bg-primary/10 text-primary border border-primary/20'
-          : 'hover:bg-base-200 text-base-content hover:text-primary'
+        ${
+          isActive
+            ? linkIsAdmin
+              ? 'bg-error/10 text-error border border-error/20'
+              : linkIsPremium
+              ? 'bg-warning/10 text-warning border border-warning/20'
+              : 'bg-primary/10 text-primary border border-primary/20'
+            : 'hover:bg-base-200 text-base-content hover:text-primary'
         }
       `}
       onClick={() => mobile && setIsMobileMenuOpen(false)}
@@ -135,9 +172,7 @@ const Navbar = () => {
           }
         `}
       >
-        <div
-          className="w-11/12 mx-auto"
-        >
+        <div className="w-11/12 mx-auto">
           <div className="flex items-center justify-between h-20 rounded-4xl">
             {/* Logo */}
             <motion.div
@@ -208,7 +243,7 @@ const Navbar = () => {
                     </motion.div>
 
                     {/* Advanced Dropdown Menu */}
-                    <ul className="dropdown-content menu bg-base-100 rounded-2xl shadow-2xl border border-base-300/50 w-72 p-4 mt-2">
+                    <ul className="dropdown-content menu bg-base-100 rounded-2xl shadow-md border border-base-300/50 w-90 p-4 mt-2">
                       {/* User Info Header */}
                       <li className="mb-3 p-3 bg-base-200 rounded-xl">
                         <div className="flex items-center gap-3">

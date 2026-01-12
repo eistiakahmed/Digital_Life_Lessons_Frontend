@@ -11,6 +11,7 @@ import Testimonials from './HomePageUI/Testimonials';
 import Newsletter from './HomePageUI/Newsletter';
 import FAQ from './HomePageUI/FAQ';
 import CallToAction from './HomePageUI/CallToAction';
+import DemoAccess from './HomePageUI/DemoAccess';
 
 const Home = () => {
   return (
@@ -42,13 +43,16 @@ const Home = () => {
       {/* 9. Testimonials */}
       <Testimonials />
 
-      {/* 10. Newsletter */}
+      {/* 10. Demo Access */}
+      <DemoAccess />
+
+      {/* 11. Newsletter */}
       <Newsletter />
 
-      {/* 11. FAQ */}
+      {/* 12. FAQ */}
       <FAQ />
 
-      {/* 12. Call to Action */}
+      {/* 13. Call to Action */}
       <CallToAction />
     </div>
   );

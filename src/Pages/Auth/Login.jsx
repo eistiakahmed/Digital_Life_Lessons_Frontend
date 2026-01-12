@@ -11,18 +11,21 @@ import {
   FaArrowRight,
   FaCheckCircle,
   FaUser,
+  FaShieldAlt,
 } from 'react-icons/fa';
-import useAxios from '../../hooks/useAxios';
+// import useAxios from '../../hooks/useAxios';
 import { useState } from 'react';
 import { IoIosEye, IoIosEyeOff } from 'react-icons/io';
 import { syncUserWithBackend } from '../../utils/userSync';
 import { FormInput, LoadingButton } from '../../Components/FormComponents';
+import DemoCredentials from '../../Components/DemoCredentials/DemoCredentials';
 
 const Login = () => {
   const { signInUser, signInGoogle } = useAuth();
-  const axios = useAxios();
+  // const axios = useAxios();
   const [textToggling, setTextToggling] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDemoCredentials, setShowDemoCredentials] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,6 +33,7 @@ const Login = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm();
 
   const handleLogin = async (data) => {
@@ -43,6 +47,11 @@ const Login = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleAutoFillCredentials = (email, password) => {
+    setValue('email', email);
+    setValue('password', password);
   };
 
   const handleGoogleLogin = async () => {
@@ -220,7 +229,7 @@ const Login = () => {
                 <button
                   onClick={() => setTextToggling(!textToggling)}
                   type="button"
-                  className="absolute right-3 top-10.5 text-base-content/60 hover:text-base-content transition-colors"
+                  className="absolute right-1 top-7.5 text-base-content/60 hover:text-base-content transition-colors"
                 >
                   {textToggling ? (
                     <IoIosEyeOff size={22} />
@@ -269,21 +278,47 @@ const Login = () => {
                 Continue with Google
               </motion.button>
 
-              {/* Demo Login Button */}
-              <motion.button
-                type="button"
-                onClick={() => {
-                  // Auto-fill demo credentials
-                  document.querySelector('input[type="email"]').value = 'demo@digitallifelessons.com';
-                  document.querySelector('input[type="password"]').value = 'Demo123!@#';
-                }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="btn w-full btn-outline btn-info gap-3 font-semibold"
-              >
-                <FaUser className="w-4 h-4" />
-                Try Demo Account
-              </motion.button>
+              {/* Demo Login Buttons */}
+              <div className="space-y-3">
+                <p className="text-center text-sm text-base-content/60 font-medium">Try Demo Accounts:</p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* User Demo */}
+                  <motion.button
+                    type="button"
+                    onClick={() => handleAutoFillCredentials('user@digitallifelessons.com', 'User123!@#')}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="btn btn-outline btn-info gap-2 font-semibold"
+                  >
+                    <FaUser className="w-4 h-4" />
+                    User Demo
+                  </motion.button>
+
+                  {/* Admin Demo */}
+                  <motion.button
+                    type="button"
+                    onClick={() => handleAutoFillCredentials('admin@digitallifelessons.com', 'Admin123!@#')}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="btn btn-outline btn-error gap-2 font-semibold"
+                  >
+                    <FaShieldAlt className="w-4 h-4" />
+                    Admin Demo
+                  </motion.button>
+                </div>
+
+                {/* View All Demo Credentials */}
+                <motion.button
+                  type="button"
+                  onClick={() => setShowDemoCredentials(true)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="btn btn-ghost btn-sm w-full gap-2 text-primary"
+                >
+                  View All Demo Credentials
+                </motion.button>
+              </div>
 
               <p className="text-center text-sm text-base-content/70 mt-6">
                 Don't have an account?{' '}
@@ -298,6 +333,14 @@ const Login = () => {
           </div>
         </motion.div>
       </motion.div>
+
+      {/* Demo Credentials Modal */}
+      {showDemoCredentials && (
+        <DemoCredentials
+          onClose={() => setShowDemoCredentials(false)}
+          onAutoFill={handleAutoFillCredentials}
+        />
+      )}
     </div>
   );
 };

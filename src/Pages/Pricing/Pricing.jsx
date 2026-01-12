@@ -18,6 +18,8 @@ import {
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 import Spinner from '../../Components/Spinner/Spinner';
+import { getPaymentUrls } from '../../utils/urlUtils';
+import { debugPaymentConfig, logPaymentRequest } from '../../utils/paymentDebug';
 
 const features = [
   {
@@ -205,9 +207,23 @@ const Pricing = () => {
     try {
       toast.loading('Redirecting to payment...', { id: 'payment' });
 
-      const res = await axios.post('/create-checkout-session', {
+      // Get payment URLs for current environment
+      const paymentUrls = getPaymentUrls();
+      
+      // Debug payment configuration (remove in production)
+      if (import.meta.env.DEV) {
+        debugPaymentConfig();
+      }
+      
+      const requestData = {
         authorEmail: user.email,
-      });
+        ...paymentUrls,
+      };
+      
+      // Log payment request for debugging
+      logPaymentRequest(requestData);
+      
+      const res = await axios.post('/create-checkout-session', requestData);
 
       toast.dismiss('payment');
 

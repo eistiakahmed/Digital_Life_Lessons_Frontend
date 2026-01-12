@@ -136,7 +136,7 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border bg-base-100 p-6 shadow">
+        <div className="rounded-2xl bg-base-100 p-6 shadow-md">
           <h3 className="mb-4 flex items-center gap-2 text-lg font-bold">
             <FaChartLine /> Weekly Growth
           </h3>
@@ -153,7 +153,7 @@ const AdminDashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        <div className="rounded-2xl border bg-base-100 p-6 shadow">
+        <div className="rounded-2xl shadow-md bg-base-100 p-6">
           <h3 className="mb-4 text-lg font-bold">Top Contributors</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={contributors}>

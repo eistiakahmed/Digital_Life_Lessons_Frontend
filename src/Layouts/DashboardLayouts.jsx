@@ -1,8 +1,9 @@
-import { NavLink, Outlet } from 'react-router';
+import { NavLink, Outlet, Link } from 'react-router';
 import Logo from '../Shared/Logo/Logo';
 import ThemeToggle from '../Components/ThemeToggle';
 import useAuth from '../hooks/useAuth';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { LuBookMarked, LuLayoutDashboard } from 'react-icons/lu';
 import {
@@ -14,7 +15,11 @@ import {
   FaFlag,
   FaShieldAlt,
   FaBars,
+  FaTachometerAlt,
+  FaChevronDown,
+  FaCrown,
 } from 'react-icons/fa';
+
 
 const NavItem = ({ to, icon, label, end, activeColor, onClick }) => (
   <li>
@@ -37,10 +42,11 @@ const NavItem = ({ to, icon, label, end, activeColor, onClick }) => (
 );
 
 const DashboardLayouts = () => {
-  const { LogoutUser, userDB } = useAuth();
+  const { LogoutUser, userDB, user } = useAuth();
 
   const role = userDB?.role;
   const isAdmin = role === 'admin';
+  const isPremium = userDB?.isPremium;
 
   const handleLogout = async () => {
     try {
@@ -131,7 +137,7 @@ const DashboardLayouts = () => {
       </ul>
 
       <div className="pt-6 border-t text-sm text-center text-base-content">
-        DigitalLifeLessons © 2025
+        DigitalLifeLessons © 2026
       </div>
     </>
   );
@@ -160,13 +166,126 @@ const DashboardLayouts = () => {
             </div>
             <div className="flex-none flex items-center gap-2">
               <ThemeToggle />
-              <button
-                onClick={handleLogout}
-                className="btn btn-primary btn-sm rounded-full gap-2"
-              >
-                <FaSignOutAlt />
-                <span className="hidden sm:inline">Logout</span>
-              </button>
+              
+              {/* Profile Dropdown for Mobile */}
+              <div className="dropdown dropdown-end">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  tabIndex={0}
+                  role="button"
+                  className="flex items-center gap-2 p-1 rounded-lg hover:bg-base-200 transition-colors cursor-pointer"
+                >
+                  <div className="avatar">
+                    <div className="w-10 h-10 rounded-full ring-2 ring-primary/20">
+                      <img
+                        src={
+                          user?.photoURL ||
+                          `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            user?.displayName || 'User'
+                          )}&background=4F46E5&color=fff`
+                        }
+                        alt={user?.displayName || 'User'}
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                  </div>
+                  <div className="hidden sm:block text-left">
+                    <div className="text-sm font-medium text-base-content truncate max-w-24">
+                      {user?.displayName || 'User'}
+                    </div>
+                    <div className="text-xs text-base-content/60">
+                      {isPremium ? 'Premium' : isAdmin ? 'Admin' : 'Free'}
+                    </div>
+                  </div>
+                  <FaChevronDown className="w-3 h-3 text-base-content/60 hidden sm:block" />
+                </motion.div>
+
+                {/* Advanced Dropdown Menu */}
+                <ul className="dropdown-content menu bg-base-100 rounded-2xl shadow-2xl border border-base-300/50 w-90 p-4 mt-2 z-50">
+                  {/* User Info Header */}
+                  <li className="mb-3 p-3 bg-base-200 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="avatar">
+                        <div className="w-12 h-12 rounded-full">
+                          <img
+                            src={
+                              user?.photoURL ||
+                              `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                user?.displayName || 'User'
+                              )}&background=4F46E5&color=fff`
+                            }
+                            alt={user?.displayName || 'User'}
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-base-content">
+                          {user?.displayName || 'User'}
+                        </div>
+                        <div className="text-sm text-base-content/60 truncate">
+                          {user?.email}
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          {isPremium && (
+                            <span className="badge badge-warning badge-xs gap-1">
+                              <FaCrown className="w-2 h-2" />
+                              Premium
+                            </span>
+                          )}
+                          {isAdmin && (
+                            <span className="badge badge-error badge-xs gap-1">
+                              <FaShieldAlt className="w-2 h-2" />
+                              Admin
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+
+                  
+                  
+                  
+
+                  {isAdmin && (
+                    <li>
+                      <Link
+                        to="/dashboard/admin"
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-error/10 text-error"
+                      >
+                        <FaShieldAlt className="w-4 h-4" />
+                        <span>Admin Panel</span>
+                      </Link>
+                    </li>
+                  )}
+
+                  {!isPremium && !isAdmin && (
+                    <li>
+                      <Link
+                        to="/pricing"
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-warning/10 text-warning"
+                      >
+                        <FaCrown className="w-4 h-4" />
+                        <span>Upgrade to Premium</span>
+                      </Link>
+                    </li>
+                  )}
+
+                  <div className="divider my-2"></div>
+
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-error/10 text-error w-full"
+                    >
+                      <FaSignOutAlt className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -183,13 +302,151 @@ const DashboardLayouts = () => {
 
                 <div className="flex items-center gap-3">
                   <ThemeToggle />
-                  <button
-                    onClick={handleLogout}
-                    className="btn btn-primary btn-sm rounded-full gap-2"
-                  >
-                    <FaSignOutAlt />
-                    Logout
-                  </button>
+                  
+                  {/* Profile Dropdown for Desktop */}
+                  <div className="dropdown dropdown-end">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      tabIndex={0}
+                      role="button"
+                      className="flex items-center gap-2 p-1 rounded-lg hover:bg-base-200 transition-colors cursor-pointer "
+                    >
+                      <div className="avatar">
+                        <div className="w-10 h-10 rounded-full ring-2 ring-primary/20">
+                          <img
+                            src={
+                              user?.photoURL ||
+                              `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                user?.displayName || 'User'
+                              )}&background=4F46E5&color=fff`
+                            }
+                            alt={user?.displayName || 'User'}
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+                      </div>
+                      <div className="hidden sm:block text-left">
+                        <div className="text-sm font-medium text-base-content truncate max-w-24">
+                          {user?.displayName || 'User'}
+                        </div>
+                        <div className="text-xs text-base-content/60">
+                          {isPremium ? 'Premium' : isAdmin ? 'Admin' : 'Free'}
+                        </div>
+                      </div>
+                      <FaChevronDown className="w-3 h-3 text-base-content/60 hidden sm:block" />
+                    </motion.div>
+
+                    {/* Advanced Dropdown Menu */}
+                    <ul className="dropdown-content menu bg-base-100 rounded-2xl shadow-2xl border border-base-300/50 w-90 p-4 mt-2 z-50">
+                      {/* User Info Header */}
+                      <li className="mb-3 p-3 bg-base-200 rounded-xl">
+                        <div className="flex items-center gap-3">
+                          <div className="avatar">
+                            <div className="w-12 h-12 rounded-full">
+                              <img
+                                src={
+                                  user?.photoURL ||
+                                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                    user?.displayName || 'User'
+                                  )}&background=4F46E5&color=fff`
+                                }
+                                alt={user?.displayName || 'User'}
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-base-content">
+                              {user?.displayName || 'User'}
+                            </div>
+                            <div className="text-sm text-base-content/60 truncate">
+                              {user?.email}
+                            </div>
+                            <div className="flex items-center gap-2 mt-1">
+                              {isPremium && (
+                                <span className="badge badge-warning badge-xs gap-1">
+                                  <FaCrown className="w-2 h-2" />
+                                  Premium
+                                </span>
+                              )}
+                              {isAdmin && (
+                                <span className="badge badge-error badge-xs gap-1">
+                                  <FaShieldAlt className="w-2 h-2" />
+                                  Admin
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+
+                      {/* Menu Items */}
+                      <li>
+                        <Link
+                          to="/dashboard"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-base-200"
+                        >
+                          <FaTachometerAlt className="w-4 h-4 text-primary" />
+                          <span>Dashboard</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/dashboard/profile"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-base-200"
+                        >
+                          <FaUser className="w-4 h-4 text-secondary" />
+                          <span>Profile Settings</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/dashboard/favorites"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-base-200"
+                        >
+                          <FaHeart className="w-4 h-4 text-error" />
+                          <span>Favorites</span>
+                        </Link>
+                      </li>
+
+                      {isAdmin && (
+                        <li>
+                          <Link
+                            to="/dashboard/admin"
+                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-error/10 text-error"
+                          >
+                            <FaShieldAlt className="w-4 h-4" />
+                            <span>Admin Panel</span>
+                          </Link>
+                        </li>
+                      )}
+
+                      {!isPremium && !isAdmin && (
+                        <li>
+                          <Link
+                            to="/pricing"
+                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-warning/10 text-warning"
+                          >
+                            <FaCrown className="w-4 h-4" />
+                            <span>Upgrade to Premium</span>
+                          </Link>
+                        </li>
+                      )}
+
+                      <div className="divider my-2"></div>
+
+                      <li>
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-error/10 text-error w-full"
+                        >
+                          <FaSignOutAlt className="w-4 h-4" />
+                          <span>Sign Out</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 
